@@ -329,8 +329,13 @@ body.homepage{
     border-radius: 8px;
     padding: 10px;
     background-color: #f9f9f9;
-    margin-bottom: 20px;
+    margin-bottom: 2px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.announcement-card:hover{
+    transform: scale(1.03);
 }
 
 .announcement-title {
