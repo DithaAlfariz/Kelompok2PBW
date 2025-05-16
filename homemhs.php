@@ -23,10 +23,10 @@
                     <a class="nav-link active" href="homemhs.php" id="home-link">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="pengaduan.php" id="pengaduan-link">Pengaduan</a>
+                    <a class="nav-link" href="pengaduanmhs.php" id="pengaduan-link">Pengaduan</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="histori.php" id="history-link">Histori</a>
+                    <a class="nav-link" href="historimhs.php" id="history-link">Histori</a>
                 </li>
             </ul>
             <div class="dropdown">
