@@ -34,7 +34,7 @@
                     </select>
                 </form>
             </div>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-2">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-3">
             <!-- Card 1 -->
             <div class="col">
                 <div class="announcement-card h-100">
