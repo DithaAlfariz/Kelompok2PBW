@@ -380,6 +380,11 @@ body.homepage{
     color: #555;
 }
 
+.footer-custom {
+    text-align: center;
+    padding: 10px 0;
+    color: rgb(168, 168, 168);
+}
 
 /* pengaduanstyling */
 

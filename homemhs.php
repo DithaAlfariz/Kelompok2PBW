@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="js/script.js">
 </head>
-<body class="homepage">
+<body class="homepage min-vh-100 d-flex flex-column">
 
 <?php include 'navbar.php'; ?>
 
@@ -21,7 +21,7 @@
             <p>SiLapor adalah website pengaduan mahasiswa yang dirancang untuk memudahkan mahasiswa menyampaikan aduan terkait akademik, sarana prasarana, dan PPKS. Bersama, kita wujudkan lingkungan kampus yang lebih baik!</p>
         </div>
     </div>
-    <div class="announcement-container">
+    <div class="announcement-container mb-3">
         <h2 class="section-pengumuman mb-0">Pengumuman</h2>
             <div class="filter-container mb-3">
                 <form method="GET" action="">
@@ -34,7 +34,7 @@
                     </select>
                 </form>
             </div>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-2">
             <!-- Card 1 -->
             <div class="col">
                 <div class="announcement-card h-100">
@@ -96,32 +96,62 @@
             <div class="col">
                 <div class="announcement-card h-100">
                     <div class="announcement-img"></div>
-                    <h4 class="announcement-title">AC Ruangan 3-04 Rusak</h4>
+                    <h4 class="announcement-title">Tidak bisa isi KRS</h4>
                     <div class="announcement-info">
-                        <span class="announcement-kategori">Sarana & Prasarana</span>
+                        <span class="announcement-kategori">Akademik</span>
                         <span class="announcement-date">| Diterbitkan: 14/05/2025</span>
                     </div>
                     <div class="announcement-status">
                         <span class="status-label">Status:</span>
-                        <span class="status-value status-process">Proses</span>
+                        <span class="status-value status-process">Selesai</span>
                     </div>
                     <p class="announcement-desc">
-                        AC Ruangan 3-04 sedang diperbaiki teknisi.
+                        sudah bisa isi KRS.
                     </p>
                 </div>
-            </div>
-        
+            </div>        
     </div>
 </div>
+
+<footer class="footer-custom mt-auto">
+    <p>Copyright &copy; 2025 by SIC Kelompok 2</p>
+</footer>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Tandai menu yang aktif
     const currentPage = 'home';
     document.getElementById(currentPage + '-link').classList.add('active');
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedKategori = urlParams.get('kategori') || 'Semua';
+    
+    document.getElementById('kategori').value = selectedKategori;
+    
+    filterCards(selectedKategori);
+    
+    document.getElementById('kategori').addEventListener('change', function() {
+        const selectedKategori = this.value;
+        filterCards(selectedKategori);
+    });
 });
+
+function filterCards(kategori) {
+    
+    const cards = document.querySelectorAll('.announcement-card');
+    
+    cards.forEach(card => {
+        const cardKategori = card.querySelector('.announcement-kategori').textContent;
+        
+        if (kategori === 'Semua' || cardKategori === kategori) {
+            card.closest('.col').style.display = 'block';
+        } else {
+            card.closest('.col').style.display = 'none';
+        }
+    });
+}
 </script>
 </body>
 </html>

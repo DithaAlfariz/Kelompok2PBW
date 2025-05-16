@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="min-vh-100 d-flex flex-column">
     
 <?php include 'navbar.php'; ?>
 
@@ -35,6 +35,10 @@
             <a href="detailhistorimhs.php?id=4" class="detail-link">Detail</a>
         </div>
 </div>
+
+<footer class="footer-custom mt-auto">
+    <p>Copyright &copy; 2025 by SIC Kelompok 2</p>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
