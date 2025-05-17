@@ -16,7 +16,7 @@
 
 <h1 class="judul-histori">DETAIL ADUAN</h1>
 
-<div class="detail-container mt-6">
+<div class="detail-container mt-6 mb-3">
     <p><strong>Kategori:</strong> <span id="kategorii"></span></p>
     <p><strong>Nama:</strong> <span id="nama"></span></p>
     <p><strong>NPM:</strong> <span id="npm"></span></p>
@@ -61,7 +61,7 @@
 
     <hr>
     <h4>Feedback Admin</h4>
-    <p><strong>Status:</strong> <span id="status"></span></p>
+    <p><strong>Status:</strong> <span class="status-value status-process" id="status"></span></p>
     <p><strong>Komentar Admin:</strong> <span id="komentar"></span></p>
     <a href="historimhs.php" class="back-link">Kembali ke Histori</a>
 </div>
