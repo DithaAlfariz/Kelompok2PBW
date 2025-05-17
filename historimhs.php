@@ -15,22 +15,22 @@
 
 <div class="container list-histori mt-4">
         <div class="history-item">
-            <span>Judul Aduan 1</span>
+            <span><strong>Judul Aduan 1</strong></span>
             <span>Tanggal Pengaduan: 10-05-2025</span>
             <a href="detailhistorimhs.php?id=1" class="detail-link">Detail</a>
         </div>
         <div class="history-item">
-            <span>Judul Aduan 2</span>
+            <span><strong>Judul Aduan 2</strong></span>
             <span>Tanggal Pengaduan: 11-05-2025</span>
             <a href="detailhistorimhs.php?id=2" class="detail-link">Detail</a>
         </div>
         <div class="history-item">
-            <span>Judul Aduan 3</span>
+            <span><strong>Judul Aduan 3</strong></span>
             <span>Tanggal Pengaduan: 12-05-2025</span>
             <a href="detailhistorimhs.php?id=3" class="detail-link">Detail</a>
         </div>
         <div class="history-item">
-            <span>Judul Aduan 4</span>
+            <span><strong>Judul Aduan 4</strong></span>
             <span>Tanggal Pengaduan: 13-05-2025</span>
             <a href="detailhistorimhs.php?id=4" class="detail-link">Detail</a>
         </div>

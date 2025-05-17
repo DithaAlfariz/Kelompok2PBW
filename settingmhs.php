@@ -35,7 +35,7 @@
         <!-- Content Area -->
         <div class="col-md-9 settings-content">
             <div class="tab-content" id="settingsTabContent">
-                <!-- Profile Tab -->
+                <!-- Profil Tab -->
                 <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                     <h5 class="section-title">Profil Pengguna</h5>
                     <form id="profileForm">
@@ -78,7 +78,7 @@
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <button type="submit" class="btn btn-warning">
+                            <button type="submit" class="btn btn-confirm">
                                 <i class="fas fa-save me-2"></i> Simpan Perubahan
                             </button>
                         </div>
@@ -103,7 +103,7 @@
                                     <input type="email" class="form-control" id="newEmail" placeholder="Masukkan email baru" required>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="submit" class="btn btn-warning">
+                                    <button type="submit" class="btn btn-confirm">
                                         <i class="fas fa-envelope me-2"></i> Ubah Email
                                     </button>
                                 </div>
@@ -129,7 +129,7 @@
                                     <input type="password" class="form-control" id="confirmPassword" placeholder="Konfirmasi password baru" required>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="submit" class="btn btn-warning">
+                                    <button type="submit" class="btn btn-confirm">
                                         <i class="fas fa-key me-2"></i> Ubah Password
                                     </button>
                                 </div>
