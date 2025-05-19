@@ -86,7 +86,7 @@
                 <td>Judul 1</td>
                 <td>Akademik</td>
                 <td>15-05-2025</td>
-                <td><a href="4-detailaduan.html">Detail</a></td>
+                <td><a href="4-detailaduan.php">Detail</a></td>
                 <td><span class="badge bg-danger">Proses</span></td>
                 <td><span class="badge bg-secondary">Tidak Terkirim</span></td>
             </tr>
@@ -95,7 +95,7 @@
                 <td>Judul 1</td>
                 <td>PPKS</td>
                 <td>15-05-2025</td>
-                <td><a href="4-detailaduan.html">Detail</a></td>
+                <td><a href="4-detailaduan.php">Detail</a></td>
                 <td><span class="badge bg-danger">Proses</span></td>
                 <td><span class="badge bg-success">Terkirim</span></td>
             </tr>
@@ -104,7 +104,7 @@
                 <td>Judul 1</td>
                 <td>Sarana Prasarana</td>
                 <td>15-05-2025</td>
-                <td><a href="4-detailaduan.html">Detail</a></td>
+                <td><a href="4-detailaduan.php">Detail</a></td>
                 <td><span class="badge bg-success">Selesai</span></td>
                 <td><span class="badge bg-success">Terkirim</span></td>
             </tr>
