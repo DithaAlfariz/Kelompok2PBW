@@ -12,7 +12,7 @@
     
 <?php include 'navbar.php'; ?>
 
-<body>
+<body class="detail-histori">
 
 <h1 class="judul-histori">DETAIL ADUAN</h1>
 

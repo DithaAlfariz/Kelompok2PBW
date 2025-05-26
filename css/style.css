@@ -504,6 +504,9 @@ body.pengaduan{
 }
 
 /* Historimhs Styling */
+body.histori{
+    background: linear-gradient(135deg, var(--main-color), #c6fff5);
+}
 .judul-histori {
     /* teks selamat datang di silapor, judul histori aduan dan detail aduan */
     margin-top: 90px; 
@@ -524,7 +527,7 @@ body.pengaduan{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--main-color);
+    background-color: white;
     margin: 8px 0;
     padding: 6px 10px;
     border-radius: 5px;
@@ -552,6 +555,9 @@ body.pengaduan{
 }
 
 /* Detailhistorimhs Styling*/
+body.detail-histori{
+    background: linear-gradient(135deg, var(--main-color), #c6fff5);
+}
 .detail-container {
     max-width: 600px;
     margin: 0 auto;
