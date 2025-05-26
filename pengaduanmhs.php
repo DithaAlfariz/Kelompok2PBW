@@ -16,7 +16,7 @@
         <p>“Berani bersuara untuk perubahan! Kami menjamin keamanan dan kerahasiaan setiap pengaduan yang anda sampaikan.”</p>
     </blockquote>
 
-    <div class="container kategori-content mt-5">
+    <div class="container kategori-content mt-3">
     <h2 class="text-center">Pilih Kategori Pengaduan</h2>
     
         <a href="saranapmhs.php">

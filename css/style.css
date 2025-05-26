@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
 
-/* variabel */
-
+/* variabel palet warna*/
 :root{
     --main-color : #c3d5dc;
     --secondary-color: #213448;
@@ -17,7 +16,7 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* loginRegisterpagestyling */
+/* login dan Register Styling */
 body.login-page,
 body.register-page{
     background: linear-gradient(135deg, var(--main-color), var(--birutua));;
@@ -41,7 +40,7 @@ body.register-page{
 }
 
 
-/* navbar */
+/* Navbar Styling*/
 .navbar {
     background-color: var(--secondary-color);
     padding: 5px 10px;
@@ -73,6 +72,12 @@ body.register-page{
     color: var(--acsent-color) !important;
 }
 
+.navbar-toggler-icon {
+    /* hamburger menu warna putih */
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='white' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* dropdown profile - menu setting dan logout */
 .dropdown-menu .dropdown-item {
     color: black;
 }
@@ -86,22 +91,12 @@ img.rounded-circle {
     border: 1px solid white;
 }
 
-/* .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='white' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-} */
 
-
-/* settingpage */
+/* Settingmhs Styling */
 .settings-sidebar.nav-link.active {
     font-weight: bold;
 }
-        
-.settings-container {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
-        
+
 .settings-sidebar {
     background-color: #fff;
     border-radius: 10px 0 0 10px;
@@ -109,13 +104,7 @@ img.rounded-circle {
     height: 100%;
     border-right: 1px solid #e9ecef;
 }
-        
-.settings-content {
-    background-color: #fff;
-    border-radius: 0 10px 10px 0;
-    padding: 25px;
-}
-        
+
 .settings-menu .nav-link {
     color: #495057 !important;
     padding: 12px 20px;
@@ -135,8 +124,39 @@ img.rounded-circle {
     color: #1e2a3a !important;
     font-weight: bold;
 }
+
+.section-title {
+    /* teks judul profil pengguna dan pengaturan akun */
+    position: relative;
+    font-size: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+        
+.section-title:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--secondary-color);
+}
+        
+.settings-container {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+        
+.settings-content {
+    background-color: #fff;
+    border-radius: 0 10px 10px 0;
+    padding: 25px;
+}
         
 .profile-image-container {
+    /* poto profil*/
     position: relative;
     width: 150px;
     height: 150px;
@@ -152,6 +172,7 @@ img.rounded-circle {
 }
         
 .image-upload-btn {
+    /* button tambah poto profil */
     position: absolute;
     bottom: 5px;
     right: 5px;
@@ -177,11 +198,12 @@ img.rounded-circle {
 }
         
 .form-label {
-    font-weight: 600;
+    font-weight: 300;
     color: #495057;
 }
             
 .btn-confirm {
+    /* button simpan perubahan, ubah akun dan ubah password */
     background-color: var(--secondary-color);
     color: #ffffff;
 }
@@ -199,28 +221,13 @@ img.rounded-circle {
     from { opacity: 0; }
     to { opacity: 1; }
 }
-        
-.section-title {
-    position: relative;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-        
-.section-title:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 50px;
-    height: 3px;
-    background-color: var(--secondary-color);
-}
 
-/* styling homepage user */
+/* Homemhs Styling*/
 body.homepage{
     background: linear-gradient(135deg, var(--main-color), #c6fff5);
 }
 
+/* Homemhs Styling - Selamat Datang */
 .hero {
     margin-top: 80px;
     background-color: #f5f5f5; 
@@ -243,6 +250,7 @@ body.homepage{
     text-align: center;
 }
 
+/* Homemhs Styling - container pengumuman*/
 .announcement-container {
     background-color: #f5f5f5; 
     padding: 10px 20px;
@@ -256,12 +264,12 @@ body.homepage{
     font-weight: 500px;
 }
 
-/* Styling untuk container filter */
+/* Homemhs Styling - container filter kategori*/
 .filter-container {
     max-width: 200px;
 }
 
-/* Style untuk select dropdown */
+/* Homemhs Styling - dropdown filter kategori*/
 #kategori {
     width: 100%;
     padding: 8px 12px;
@@ -301,6 +309,7 @@ body.homepage{
     }
 }
 
+/* Homemhs Styling - Card Pengumuman */
 .card-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -374,71 +383,11 @@ body.homepage{
     color: #555;
 }
 
-.footer-custom {
-    text-align: center;
-    padding: 10px 0;
-    color: rgb(168, 168, 168);
-}
-
-/* pengaduanstyling */
-
-/* page form pengaduan */
+/* Pengaduanmhs Styling */
 body.pengaduan{
     background: linear-gradient(135deg, var(--main-color), #c6fff5);
 }
-
-.form-container {
-    max-width: 700px; 
-    margin: 0 auto;
-    background-color: var(--birutua); 
-    padding: 20px;
-    border-radius: 8px;
-    color: white;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
-    transition: box-shadow 0.3s ease; 
-}
-
-.form-container {
-    margin-top: 30px; 
-}
-
-.kategori-content h2 {
-    margin-bottom: 20px;
-    font-size: 20px;
-    color: #fff; 
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
-}
-
-.submit-btn {
-    background-color: #01ff1a; 
-    color: white; 
-    border: none; 
-    padding: 10px 20px; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.submit-btn:hover {
-    background-color: #00b712; 
-}
-
-.form-label {
-    color: #fff; 
-    font-weight: bold; 
-}
-
-::placeholder {
-    color: #dededec7; 
-    font-style: italic; 
-    font-size: 14px;
-}
-
-.form-control {
-    width: 100%; 
-    box-sizing: border-box; 
-}
-
+/* teks "berani bersuara---" */
 .blockquote { 
     background-color: #f5f5f5; 
     padding: 20px;
@@ -449,7 +398,6 @@ body.pengaduan{
     font-style: italic; 
     margin-bottom: 50px;
 }
-
 .blockquote p {
     color: #333; 
     font-size: 16px; 
@@ -458,15 +406,15 @@ body.pengaduan{
     text-align: center; 
 }
 
-.judul-kategori { /* ini judul form kategori */
-    margin-bottom: 20px;  
-    text-decoration: underline; 
-    font-weight: 400;
-    text-decoration-color: var(--acsent-color); 
-    font-weight: 700;
+/* Pengaduanmhs Styling - Kategori*/
+.kategori-content h2 { 
+    /* teks "pilih kategori pengaduan" */
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #fff; 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
 }
 
-/* page pengaduan styling */
 .kategori-content{
     background-color: var(--birutua); 
     color: white;
@@ -496,13 +444,71 @@ body.pengaduan{
     transition: background-color 0.3s ease;
 }
 
+/* Pengaduanmhs Styling - form*/
+.judul-kategori { /* ini teks judul form kategori */
+    margin-bottom: 20px;  
+    text-decoration: underline; 
+    font-weight: 400;
+    text-decoration-color: var(--acsent-color); 
+    font-weight: 700;
+}
+
+.form-container {
+    max-width: 700px; 
+    margin: 0 auto;
+    background-color: var(--birutua); 
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
+    transition: box-shadow 0.3s ease; 
+}
+
+.form-container {
+    margin-top: 30px; 
+}
+
+.submit-btn {
+    background-color: #01ff1a; 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: #00b712; 
+}
+
+.form-label {
+    color: #fff; 
+    font-weight: bold; 
+}
+
+::placeholder {
+    /* semua halaman yang ada placeholder di form */
+    color: #dededec7; 
+    font-style: italic; 
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%; 
+    box-sizing: border-box; 
+}
 
 .kategori-btn:hover {
     background-color: var(--acsent-color); 
 }
 
-/* Histori dan Detail Styling */
+/* Historimhs Styling */
+body.histori{
+    background: linear-gradient(135deg, var(--main-color), #c6fff5);
+}
 .judul-histori {
+    /* teks selamat datang di silapor, judul histori aduan dan detail aduan */
     margin-top: 90px; 
     text-align: center;
     font-size: 22px;
@@ -521,7 +527,7 @@ body.pengaduan{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--main-color);
+    background-color: white;
     margin: 8px 0;
     padding: 6px 10px;
     border-radius: 5px;
@@ -532,7 +538,9 @@ body.pengaduan{
 .history-item span {
     font-size: 14px;
 }
-.detail-link {
+
+.detail-link { 
+    /* button untuk ke detail histori */
     text-decoration: none;
     color: var(--secondary-color);
     font-weight: bold;
@@ -546,7 +554,10 @@ body.pengaduan{
     color: white;
 }
 
-/* detail histori */
+/* Detailhistorimhs Styling*/
+body.detail-histori{
+    background: linear-gradient(135deg, var(--main-color), #c6fff5);
+}
 .detail-container {
     max-width: 600px;
     margin: 0 auto;
@@ -556,7 +567,9 @@ body.pengaduan{
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #f9f9f9;
 }
+
 .detail-container h4 {
+    /* teks judul feedback admin */
     text-align: center;
     margin-bottom: 20px;
     font-size: 18px;
@@ -565,6 +578,7 @@ body.pengaduan{
 }
 
 .btn-lampiran {
+    /* button lihat lampiran */
     background-color: transparent; 
     color: var(--secondary-color); 
     border: 2px solid var(--secondary-color); 
@@ -583,6 +597,7 @@ body.pengaduan{
 }
 
 .back-link {
+    /* button kembali ke histori */
     display: inline-block;
     margin-top: 20px;
     padding: 5px 10px;
@@ -595,5 +610,9 @@ body.pengaduan{
     background-color: #5d959e;
 }
 
-
-
+/* Footer Styling copyright kelompok 2 */
+.footer-custom {
+    text-align: center;
+    padding: 10px 0;
+    color: rgb(168, 168, 168);
+}
