@@ -1,0 +1,67 @@
+@media screen and (max-width : 450px){
+    .judul-histori{
+        font-size: 16px;
+    }
+    .hero{
+        margin-bottom: 10px;
+    }
+    .hero-text p {
+        font-size: 12px;
+        margin: 5px 0 0;
+        text-align: center;
+    }
+    .section-pengumuman {
+        font-size: 16px !important;
+        margin-top: 8px!important;
+    }
+    .announcement-title {
+        font-size: 14px;
+        margin-bottom: 5px !important;
+    }
+
+    .announcement-info {
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .announcement-status {
+        margin-bottom: 5px !important;
+        font-size: 12px !important;
+    }
+
+    .announcement-desc {
+        font-size: 12px !important;
+        margin-bottom: 5px;
+    }
+
+    /* pengaduan */
+    .blockquote {  
+    margin-bottom: 5px;
+    }
+
+    .kategori-content h2 { 
+    /* teks "pilih kategori pengaduan" */
+    margin-bottom: 15px;
+    font-size: 16px;
+    }
+
+    .kategori-content{
+        padding: 20px;
+        max-width: 300px;
+    }
+    .kategori-btn{
+        font-size: 16px;
+    }
+    /* form pengaduan */
+    
+}
+@media screen and (max-width : 576px){
+
+}
+@media screen and (max-width : 768px){
+
+}
+
+@media screen and (max-width : 992px){
+
+}
