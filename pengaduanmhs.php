@@ -49,4 +49,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-<?php echo 'User ID: ' . ($_SESSION['user_id'] ?? 'Belum login'); ?>
