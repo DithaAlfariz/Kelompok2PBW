@@ -1,15 +1,86 @@
-<!-- adminformadduser.html / adminformedituser.html -->
+<?php
+include '../koneksi.php';
+session_start();
+
+// Fungsi generate random ID
+function generateRandomId($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomId = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomId .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomId;
+}
+
+// Proses tambah admin
+if (isset($_POST['simpan'])) {
+    $username = mysqli_real_escape_string($conn, $_POST['nama']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $role = 'admin';
+    
+    // Cek email sudah ada atau belum
+    $check_email = mysqli_query($conn, "SELECT * FROM table_user WHERE email='$email'");
+    if(mysqli_num_rows($check_email) > 0) {
+        echo "<script>alert('Email sudah terdaftar!');window.location='3-kelolauser.php';</script>";
+        exit;
+    }
+
+    // Generate random id dan pastikan unik
+    do {
+        $id = generateRandomId();
+        $check = mysqli_query($conn, "SELECT id FROM table_user WHERE id = '$id'");
+    } while(mysqli_num_rows($check) > 0);
+
+    // Query insert dengan ID yang digenerate
+    $query = "INSERT INTO table_user (id, username, email, password, role) VALUES (?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "sssss", $id, $username, $email, $password, $role);
+    
+    if(mysqli_stmt_execute($stmt)) {
+        header("Location: 3-kelolauser.php");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+
+// Proses edit admin
+if (isset($_POST['update'])) {
+    $id = mysqli_real_escape_string($conn, $_POST['id']);
+    $username = mysqli_real_escape_string($conn, $_POST['nama']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+
+    $query = "UPDATE table_user SET username='$username', email='$email'";
+    if (!empty($password)) {
+        $query .= ", password='$password'";
+    }
+    $query .= " WHERE id='$id' AND role='admin'";
+    mysqli_query($conn, $query);
+    header("Location: 3-kelolauser.php");
+    exit;
+}
+
+// Ambil data admin untuk form edit
+$user = null;
+if (isset($_GET['edit'])) {
+    $id = mysqli_real_escape_string($conn, $_GET['edit']);
+    $result = mysqli_query($conn, "SELECT * FROM table_user WHERE id='$id'");
+    $user = mysqli_fetch_assoc($result);
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Form User</title>
+  <title>Form Admin</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/nav.css">
   <link rel="stylesheet" href="css/5-user.css">
 </head>
-<main class="flex-grow-1">
 <body class="kelolauser">
 <nav class="navbar navbar-expand-lg">
     <div class="container">
@@ -39,7 +110,7 @@
                             </a>
                         </li>
                         <li>
-                            <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="#">
+                            <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="../logout.php">
                                 <img src="img/icons8-logout-24.png" alt="Setting Icon" class="me-2" width="20">
                                 Logout
                             </a>
@@ -50,105 +121,32 @@
      </div>
 </nav>
 
-<h2 class="fw-bold">Tambah User</h2>
+<h2 class="fw-bold"><?= $user ? 'Edit Admin' : 'Tambah Admin' ?></h2>
 <div class="container-form">
-    <form action="#">
+    <form method="POST" action="">
+        <?php if($user): ?>
+            <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+        <?php endif; ?>
         <div class="form-group">
-            <label for="nama">Nama User</label>
-                <input type="text" id="nama" name="nama" placeholder="Masukkan nama">
+            <label for="nama">Nama Admin</label>
+            <input type="text" id="nama" name="nama" placeholder="Masukkan nama" value="<?= $user ? htmlspecialchars($user['username']) : '' ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email Admin</label>
+            <input type="email" id="email" name="email" placeholder="Masukkan email" value="<?= $user ? htmlspecialchars($user['email']) : '' ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="password"><?= $user ? 'Password Baru (kosongkan jika tidak diubah)' : 'Password' ?></label>
+            <input type="password" id="password" name="password" placeholder="Masukkan Password" <?= $user ? '' : 'required' ?>>
+        </div>
+        <div class="form-buttons">
+            <button class="btn btn-kembali" type="button" onclick="window.location.href='3-kelolauser.php'">Kembali</button>
+            <div class="right-buttons">
+                <button type="submit" class="btn btn-simpan" name="<?= $user ? 'update' : 'simpan' ?>"><?= $user ? 'Update' : 'Simpan' ?></button>
             </div>
-            <div class="form-group">
-                <label for="email">Email User</label>
-                <input type="email" id="email" name="email" placeholder="Masukkan email">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Masukkan Password">
-            </div>
-            <div class="form-group">
-                <label for="level">Level</label>
-                <select id="level" name="level">
-                    <option value="Admin">Admin</option>
-                    <option value="User">User</option>
-                </select>
-            </div>
-            <div class="form-buttons">
-                <button class="btn btn-kembali" type="button" onclick="window.location.href='3-kelolauser.php'">Kembali</button>
-                <div class="right-buttons">
-                    <button type="button" class="btn btn-reset" onclick="resetForm()">Reset</button>
-                    <button type="submit" class="btn btn-simpan">Simpan</button>
-                </div>
-            </div>            
-        </form>
-    </div>    
-</body>
-<script>
-    // Ambil parameter dari URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const nama = urlParams.get('nama');
-    const email = urlParams.get('email');
-    const level = urlParams.get('level');
-  
-    // Isi form dengan data dari URL
-    document.getElementById('nama').value = nama || '';
-    document.getElementById('email').value = email || '';
-    document.getElementById('level').value = level || 'User';
-  
-    // Fungsi untuk menyimpan perubahan
-    document.querySelector('.btn-simpan').addEventListener('click', function(event) {
-        event.preventDefault(); // Mencegah form submit default
-  
-        // Ambil data dari form
-        const updatedNama = document.getElementById('nama').value;
-        const updatedEmail = document.getElementById('email').value;
-        const updatedLevel = document.getElementById('level').value;
-  
-        // Simpan data ke localStorage (simulasi penyimpanan)
-        alert(`Data berhasil diperbarui:\nNama: ${updatedNama}\nEmail: ${updatedEmail}\nLevel: ${updatedLevel}`);
-  
-        // Kembali ke halaman Kelola User
-        window.location.href = '3-kelolauser.php';
-    });
-  </script>
-<script>
-    document.querySelector('.btn-simpan').addEventListener('click', function(event) {
-        event.preventDefault(); // Mencegah form submit default
-
-        // Ambil data dari form
-        const nama = document.getElementById('nama').value;
-        const email = document.getElementById('email').value;
-        const level = document.getElementById('level').value;
-
-        if (nama && email && level) {
-            // Ambil data user yang sudah ada di localStorage
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-
-            // Tambahkan user baru ke array
-            users.push({ nama, email, level });
-
-            // Simpan kembali ke localStorage
-            localStorage.setItem('users', JSON.stringify(users));
-
-            // Tampilkan notifikasi
-            alert('User berhasil ditambahkan!');
-
-            // Kembali ke halaman Kelola User
-            window.location.href="3-kelolauser.php";
-        } else {
-            alert('Harap isi semua data!');
-        }
-    });
-
-    function resetForm() {
-        // Ambil elemen form
-        const form = document.querySelector('form');
-
-        // Reset semua input dalam form
-        form.reset();
-
-        // Tambahkan logika tambahan jika diperlukan
-        alert('Form telah direset!');
-    }
-</script>
+        </div>            
+    </form>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

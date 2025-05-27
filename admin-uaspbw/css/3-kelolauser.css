@@ -1,51 +1,139 @@
-.table-container {
-    background-color: var(--birutua);
-    padding: 20px;
-    border-radius: 10px;
-    color: white;
-    overflow-x: auto;
-    position: relative;
-}
-
-.add-user-btn {
-    background-color: #213448;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    float: right;
-    margin-bottom: 10px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
+.container-form {
+    max-width: 600px;
     background-color: white;
-    color: black;
-    border-radius: 8px;
-    overflow: hidden;
+    padding: 30px;
+    margin: 40px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
+.container-form h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #0a0a0a;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
     padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ccc;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
 }
 
-th {
-    background-color: #f0f0f0;
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #007bff;
 }
 
-.edit-btn, .delete-btn {
-    background: none;
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.btn {
+    min-width: 120px;
+    padding: 10px 0;
+    font-size: 14px;
     border: none;
-    font-size: 16px;
+    border-radius: 10px;
     cursor: pointer;
-    margin-right: 5px;
+    transition: 0.3s;
+    color: white;
+    text-align: center;
 }
 
-.edit-btn {
-    color: #007bff;
+.btn-kembali {
+    background-color: #6c757d;
+}
+
+.btn-reset {
+    background-color: #dc3545;
+}
+
+.btn-simpan {
+    background-color: #007bff;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.right-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.kelolauser {
+    background-color: #f0f0f0; /* maintain existing background color */
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-bottom: 1px solid #eee;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.table {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.table th.aksi-column,
+.table td.aksi-column {
+    text-align: right;
+    padding-right: 25px;
+    width: 120px;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    border-radius: 6px;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.table th:last-child,
+.table td:last-child {
+    text-align: right;
+    padding-right: 1.5rem;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 }

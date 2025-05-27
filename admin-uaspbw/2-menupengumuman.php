@@ -1,53 +1,60 @@
+<?php
+include '../koneksi.php';
+session_start();
+
+$user_id = $_SESSION['user_id'] ?? null;
+// Ambil filter kategori dari GET
+$kategori_terpilih = isset($_GET['kategori']) ? $_GET['kategori'] : 'Semua';
+$status_terpilih = isset($_GET['status']) ? $_GET['status'] : 'Semua';
+
+// Gabungkan filter kategori dan status
+$where = [];
+if ($kategori_terpilih && $kategori_terpilih !== 'Semua') {
+    $kategori_safe = mysqli_real_escape_string($conn, $kategori_terpilih);
+    $where[] = "h.kategori = '$kategori_safe'";
+}
+if ($status_terpilih && $status_terpilih !== 'Semua') {
+    $status_safe = mysqli_real_escape_string($conn, $status_terpilih);
+    $where[] = "d.status = '$status_safe'";
+}
+$where_sql = '';
+if (count($where) > 0) {
+    $where_sql = 'WHERE ' . implode(' AND ', $where);
+}
+
+// Query untuk mengambil semua laporan dengan join ke detail_history
+$query = "
+    SELECT h.*, d.*, h.id_pengaduan AS history_id, u.username, u.email
+    FROM history h
+    LEFT JOIN detail_history d ON h.id_pengaduan = d.id_history
+    LEFT JOIN table_user u ON h.user_id = u.id
+    $where_sql
+    ORDER BY h.created_at DESC
+";
+$result = mysqli_query($conn, $query);
+
+// Query statistik kategori
+$stat_query = "SELECT kategori, COUNT(*) as jumlah FROM history GROUP BY kategori";
+$stat_result = mysqli_query($conn, $stat_query);
+
+$kategori_data = [];
+while ($row = mysqli_fetch_assoc($stat_result)) {
+    $kategori_data[$row['kategori']] = $row['jumlah'];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aduan - Admin SiLapor!</title>
+    <title>Pengumuman - Admin SiLapor!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/2-menupengumuman.css">
 </head>
 <main class="flex-grow-1">
 <body class="pengumuman">
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand text-white fw-bold" href="#">SiLapor!</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="1-menuaduan.php" id="pengaduan-link">Aduan</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="2-menupengumuman.php" id="history-link">Pengumuman</a>
-                </li>
-            </ul>
-            <div class="dropdown">
-                <a class="dropdown-toggle text-white d-flex align-items-center text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="img/icons8-test-account-48.png" alt="Profile" class="rounded-circle me-2" width="30">
-                    <span>Admin</span>
-                </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="3-kelolauser.php">
-                                <img src="img/icons8-setting-24.png" alt="Setting Icon" class="me-2" width="20">
-                                Kelola User
-                            </a>
-                        </li>
-                        <li>
-                            <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="#">
-                                <img src="img/icons8-logout-24.png" alt="Setting Icon" class="me-2" width="20">
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-            </div>
-        </div>
-    </div>
-</nav>
+<?php include '../navadmin.php'; ?>
 
 <h2 class="fw-bold">Pengumuman</h2>
 <div class="container">
@@ -64,89 +71,78 @@
                 </form>
             </div>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-2">
-            <!-- Card 1 -->
-            <div class="col">
-                <div class="announcement-card h-100">
-                    <div class="announcement-img"></div>
-                    <h4 class="announcement-title">AC Ruangan 3-04 Rusak</h4>
-                    <div class="announcement-info">
-                        <span class="announcement-kategori">Sarana & Prasarana</span>
-                        <span class="announcement-date">| Diterbitkan: 14/05/2025</span>
+            <?php
+            // Koneksi ke database
+            $conn = new mysqli("localhost", "root", "", "silapor");
+
+            // Cek koneksi
+            if ($conn->connect_error) {
+                die("Koneksi gagal: " . $koneksi->connect_error);
+            }
+
+            // Ambil filter kategori dari GET
+            $kategori = isset($_GET['kategori']) ? $_GET['kategori'] : 'Semua';
+
+            // Query data pengumuman
+            if ($kategori == 'Semua' || $kategori == '') {
+                $sql = "SELECT * FROM pengumuman ORDER BY tanggal DESC";
+            } else {
+                $sql = "SELECT * FROM pengumuman WHERE kategori = '$kategori' ORDER BY tanggal DESC";
+            }
+            $result = $conn->query($sql);
+            ?>
+            <?php if ($result && $result->num_rows > 0): ?>
+                <?php while($row = $result->fetch_assoc()): ?>
+                    <div class="col">
+                        <!-- Seluruh card dibungkus <a> agar bisa diklik -->
+                        <a href="5-detailpengumuman.php?id=<?= $row['id']; ?>" style="text-decoration:none;color:inherit;">
+                            <div class="announcement-card h-100" style="cursor:pointer; position:relative;">
+                                <div class="announcement-img">
+                                    <?php if (!empty($row['bukti'])): ?>
+                                        <?php
+                                            $kategori_folder = strtolower(str_replace([' ', '&'], ['_', 'dan'], $row['kategori']));
+                                            $img_path = "bukti/" . $kategori_folder . "/" . htmlspecialchars($row['bukti']);
+                                        ?>
+                                        <img src="<?php echo $img_path; ?>" alt="Bukti" class="announcement-photo img-fluid" style="object-fit:cover; width:100%; height:180px; border-radius:8px;">
+                                    <?php endif; ?>
+                                </div>
+                                <h4 class="announcement-title"><?php echo htmlspecialchars($row['judul']); ?></h4>
+                                <div class="announcement-info">
+                                    <?php
+                                        $kategori_label = [
+                                            'sarana'   => 'Sarana & Prasarana',
+                                            'ppks'     => 'PPKS',
+                                            'akademik' => 'Akademik'
+                                        ];
+                                        $kategori_tampil = isset($kategori_label[strtolower($row['kategori'])]) ? $kategori_label[strtolower($row['kategori'])] : htmlspecialchars($row['kategori']);
+                                    ?>
+                                    <span class="announcement-kategori"><?php echo $kategori_tampil; ?></span>
+                                    <span class="announcement-date">| Diterbitkan: <?php echo date('d/m/Y', strtotime($row['tanggal'])); ?></span>
+                                </div>
+                                <div class="announcement-status">
+                                    <span class="status-label">Status:</span>
+                                    <span class="status-value <?php echo ($row['status'] == 'Diproses') ? 'status-process' : 'status-done'; ?>">
+                                        <?php echo htmlspecialchars($row['status']); ?>
+                                    </span>
+                                </div>
+                                <p class="announcement-desc">
+                                    <?php echo htmlspecialchars($row['komentar']); ?>
+                                </p>
+                            </div>
+                        </a>
+                        <!-- Tombol edit dan delete bisa diletakkan di luar <a> agar tidak ikut terklik -->
+                        <div style="margin-top:-40px; margin-bottom:20px;">
+                            <a href="5-detailpengumuman.php?id=<?= $row['id']; ?>" class="btn-edit">✎</a>
+                            <button class="delete-btn" onclick="deletecard(this, <?= $row['id']; ?>)">🗑️</button>
+                        </div>
                     </div>
-                    <div class="announcement-status">
-                        <span class="status-label">Status:</span>
-                        <span class="status-value status-process">Proses</span>
-                    </div>
-                    <p class="announcement-desc">
-                        AC Ruangan 3-04 sedang diperbaiki teknisi.
-                    </p>
-                    <a href="5-detailpengumuman.php" class="btn-edit">✎</a>
-                    <button class="delete-btn" onclick="deletecard(this)">🗑️</button>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="col">
+                    <div class="alert alert-info">Belum ada pengumuman.</div>
                 </div>
-            </div>
-            
-            <!-- Card 2 -->
-            <div class="col">
-                <div class="announcement-card h-100">
-                    <div class="announcement-img"></div>
-                    <h4 class="announcement-title">AC Ruangan 3-04 Rusak</h4>
-                    <div class="announcement-info">
-                        <span class="announcement-kategori">Sarana & Prasarana</span>
-                        <span class="announcement-date">| Diterbitkan: 14/05/2025</span>
-                    </div>
-                    <div class="announcement-status">
-                        <span class="status-label">Status:</span>
-                        <span class="status-value status-process">Proses</span>
-                    </div>
-                    <p class="announcement-desc">
-                        AC Ruangan 3-04 sedang diperbaiki teknisi.
-                    </p>
-                    <a href="5-detailpengumuman.php" class="btn-edit">✎</a>
-                    <button class="delete-btn" onclick="deletecard(this)">🗑️</button>
-                </div>
-            </div>
-            
-            <!-- Card 3 -->
-            <div class="col">
-                <div class="announcement-card h-100">
-                    <div class="announcement-img"></div>
-                    <h4 class="announcement-title">AC Ruangan 3-04 Rusak</h4>
-                    <div class="announcement-info">
-                        <span class="announcement-kategori">Sarana & Prasarana</span>
-                        <span class="announcement-date">| Diterbitkan: 14/05/2025</span>
-                    </div>
-                    <div class="announcement-status">
-                        <span class="status-label">Status:</span>
-                        <span class="status-value status-process">Proses</span>
-                    </div>
-                    <p class="announcement-desc">
-                        AC Ruangan 3-04 sedang diperbaiki teknisi.
-                    </p>
-                    <a href="5-detailpengumuman.php" class="btn-edit">✎</a>
-                    <button class="delete-btn" onclick="deletecard(this)">🗑️</button>
-                </div>
-            </div>
-            
-            <!-- Card 4 -->
-            <div class="col">
-                <div class="announcement-card h-100">
-                    <div class="announcement-img"></div>
-                    <h4 class="announcement-title">AC Ruangan 3-04 Rusak</h4>
-                    <div class="announcement-info">
-                        <span class="announcement-kategori">Sarana & Prasarana</span>
-                        <span class="announcement-date">| Diterbitkan: 14/05/2025</span>
-                    </div>
-                    <div class="announcement-status">
-                        <span class="status-label">Status:</span>
-                        <span class="status-value status-process">Proses</span>
-                    </div>
-                    <p class="announcement-desc">
-                        AC Ruangan 3-04 sedang diperbaiki teknisi.
-                    </p>
-                    <a href="5-detailpengumuman.php" class="btn-edit">✎</a>
-                    <button class="delete-btn" onclick="deletecard(this)">🗑️</button>
-                </div>
-            </div>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 </main>
@@ -160,14 +156,53 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Tandai menu yang aktif
     const currentPage = 'pengumuman';
-    document.getElementById(currentPage + '-link').classList.add('active');
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedKategori = urlParams.get('kategori') || 'Semua';
+    
+    document.getElementById('kategori').value = selectedKategori;
+    
+    filterCards(selectedKategori);
+    
+    document.getElementById('kategori').addEventListener('change', function() {
+        const selectedKategori = this.value;
+        filterCards(selectedKategori);
+    });
 });
-function deletecard(btn) {
-    const row = btn.closest('tr');
+
+function filterCards(kategori) {
+    const cards = document.querySelectorAll('.announcement-card');
+    cards.forEach(card => {
+        const cardKategori = card.querySelector('.announcement-kategori').textContent;
+        if (kategori === 'Semua' || cardKategori === kategori) {
+            card.parentElement.style.display = 'block';
+        } else {
+            card.parentElement.style.display = 'none';
+        }
+    });
+}
+
+function deletecard(btn, id) {
+    const col = btn.closest('.col'); // Ubah dari tr ke .col agar kartu bisa dihapus
     const confirmed = confirm('Apakah Anda yakin ingin menghapus pengumuman ini?');
     if (confirmed) {
-        row.remove();
-        updateRowNumbers();
+        fetch('hapus_pengumuman.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => {
+            if (response.ok) {
+                col.remove(); // Hapus kartu dari tampilan
+            } else {
+                alert('Gagal menghapus pengumuman. Silakan coba lagi.');
+            }
+        })
+        .catch(error => {
+            console.error('Terjadi kesalahan:', error);
+            alert('Terjadi kesalahan. Silakan coba lagi.');
+        });
     }
 }
 </script>

@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,16 +19,16 @@
         <p>“Berani bersuara untuk perubahan! Kami menjamin keamanan dan kerahasiaan setiap pengaduan yang anda sampaikan.”</p>
     </blockquote>
 
-    <div class="container kategori-content mt-3">
+    <div class="container kategori-content mt-5">
     <h2 class="text-center">Pilih Kategori Pengaduan</h2>
     
-        <a href="saranapmhs.php">
+        <a href="saranapmhs.php?user_id=<?= $_SESSION['user_id'] ?>">
             <button class="kategori-btn">Sarana & Prasarana</button>
         </a>
-        <a href="akademikmhs.php">
+        <a href="akademikmhs.php?user_id=<?= $_SESSION['user_id'] ?>">
             <button class="kategori-btn">Akademik</button>
         </a>
-        <a href="ppksmhs.php">
+        <a href="ppksmhs.php?user_id=<?= $_SESSION['user_id'] ?>">
             <button class="kategori-btn">PPKS</button>
         </a>
     </div>
@@ -45,3 +48,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+<?php echo 'User ID: ' . ($_SESSION['user_id'] ?? 'Belum login'); ?>

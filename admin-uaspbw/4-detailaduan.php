@@ -1,3 +1,84 @@
+<?php
+// Tambahkan koneksi ke database
+include '../koneksi.php';
+session_start();
+
+$user_id = $_SESSION['user_id'] ?? null;
+// Ambil parameter id dari URL
+$id = isset($_GET['id']) ? intval($_GET['id']) : 1;
+
+// Proses simpan feedback admin (hanya update detail_history)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $komentar = mysqli_real_escape_string($conn, $_POST['komentar']);
+
+    $check = mysqli_query($conn, "SELECT * FROM detail_history WHERE id_history='$id'");
+    if (mysqli_num_rows($check) > 0) {
+        $update = "UPDATE detail_history SET status='$status', komentar='$komentar' WHERE id_history='$id'";
+    } else {
+        $update = "INSERT INTO detail_history (id_history, status, komentar) VALUES ('$id', '$status', '$komentar')";
+    }
+    mysqli_query($conn, $update);
+
+    header("Location: 4-detailaduan.php?id=$id");
+    exit;
+}
+
+// Proses kirim ke pengumuman
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kirim'])) {
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $komentar = mysqli_real_escape_string($conn, $_POST['komentar']);
+    $bukti_terpilih = isset($_POST['bukti_terpilih']) ? mysqli_real_escape_string($conn, $_POST['bukti_terpilih']) : '';
+
+    // Update detail_history (set pengumuman aktif)
+    $check = mysqli_query($conn, "SELECT * FROM detail_history WHERE id_history='$id'");
+    if (mysqli_num_rows($check) > 0) {
+        $update = "UPDATE detail_history SET status='$status', komentar='$komentar', pengumuman='aktif' WHERE id_history='$id'";
+    } else {
+        $update = "INSERT INTO detail_history (id_history, status, komentar, pengumuman) VALUES ('$id', '$status', '$komentar', 'aktif')";
+    }
+    mysqli_query($conn, $update);
+
+    // Insert ke tabel pengumuman, tapi cek dulu apakah sudah ada data dengan id_history yang sama
+    $cekPengumuman = mysqli_query($conn, "SELECT id FROM pengumuman WHERE id_history='$id' LIMIT 1");
+    if (mysqli_num_rows($cekPengumuman) > 0) {
+        // Jika sudah ada, lakukan UPDATE
+        $q = mysqli_query($conn, "SELECT * FROM history WHERE id_pengaduan='$id'");
+        $aduan = mysqli_fetch_assoc($q);
+        $judul = mysqli_real_escape_string($conn, $aduan['judul']);
+        $kategori = mysqli_real_escape_string($conn, $aduan['kategori']);
+        $tanggal = mysqli_real_escape_string($conn, $aduan['created_at']);
+        mysqli_query($conn, "UPDATE pengumuman SET judul='$judul', kategori='$kategori', tanggal='$tanggal', status='$status', komentar='$komentar', bukti='$bukti_terpilih' WHERE id_history='$id'");
+    } else {
+        // Jika belum ada, lakukan INSERT
+        $q = mysqli_query($conn, "SELECT * FROM history WHERE id_pengaduan='$id'");
+        $aduan = mysqli_fetch_assoc($q);
+        $judul = mysqli_real_escape_string($conn, $aduan['judul']);
+        $kategori = mysqli_real_escape_string($conn, $aduan['kategori']);
+        $tanggal = mysqli_real_escape_string($conn, $aduan['created_at']);
+        $insertPengumuman = "INSERT INTO pengumuman (id_history, judul, kategori, tanggal, status, komentar, bukti)
+                             VALUES ('$id', '$judul', '$kategori', '$tanggal', '$status', '$komentar', '$bukti_terpilih')";
+        mysqli_query($conn, $insertPengumuman);
+    }
+
+    header("Location: 2-menupengumuman.php");
+    exit;
+}
+
+// Query LEFT JOIN history dan detail_history
+$query = "SELECT h.*, d.status, d.komentar, d.pengumuman 
+          FROM history h 
+          LEFT JOIN detail_history d ON h.id_pengaduan = d.id_history 
+          WHERE h.id_pengaduan = $id";
+$result = mysqli_query($conn, $query);
+$data = mysqli_fetch_assoc($result);
+
+// Ambil array bukti jika ada beberapa file (misal dipisah koma)
+$bukti_files = [];
+if (!empty($data['bukti'])) {
+    $bukti_files = array_map('trim', explode(',', $data['bukti']));
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,65 +89,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/4-detail.css">
+    <!-- Hapus link navadmin.css di sini, sudah di-include di navadmin.php -->
 </head>
 <body class="detailaduan">
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand text-white fw-bold" href="#">SiLapor!</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" href="1-menuaduan.phpl" id="pengaduan-link">Aduan</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="2-menupengumuman.php" id="history-link">Pengumuman</a>
-                </li>
-            </ul>
-            <div class="dropdown">
-                <a class="dropdown-toggle text-white d-flex align-items-center text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="img/icons8-test-account-48.png" alt="Profile" class="rounded-circle me-2" width="30">
-                    <span>Admin</span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="3-kelolauser.php">
-                            <img src="img/icons8-setting-24.png" alt="Setting Icon" class="me-2" width="20">
-                            Kelola User
-                        </a>
-                    </li>
-                    <li>
-                        <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="#">
-                            <img src="img/icons8-logout-24.png" alt="Setting Icon" class="me-2" width="20">
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</nav>
+<?php include '../navadmin.php'; ?>
 
 <h2 class="fw-bold">Kelola Aduan</h2>
 <div class="detail-container mt-6">
-    <p><strong>Kategori:</strong> <span id="kategorii"></span></p>
-    <p><strong>Nama:</strong> <span id="nama"></span></p>
-    <p><strong>NPM:</strong> <span id="npm"></span></p>
-    <p><strong>No. Telepon:</strong> <span id="telp"></span></p>
-    <p><strong>Judul Aduan:</strong> <span id="judul"></span></p>
-    <p><strong>Deskripsi:</strong> <span id="deskripsi"></span></p>
-    <p><strong>Lokasi:</strong> <span id="lokasi"></span></p>
-    <p><strong>Bukti Pendukung:</strong></p>
-    <div class="mb-3">
-        <div class="attachment-preview">
-            <button type="button" class="btn btn-lampiran" data-bs-toggle="modal" data-bs-target="#lampiranModal"><i class="fas fa-file me-2"></i>
-                Lihat Lampiran
-            </button>
-        </div>
-    </div>
-
+    <p><strong>Kategori:</strong> <span id="kategori"><?php echo htmlspecialchars($data['kategori'] ?? '-'); ?></span></p>
+    <p><strong>Nama:</strong> <span id="nama"><?php echo htmlspecialchars($data['nama'] ?? '-'); ?></span></p>
+    <p><strong>NPM:</strong> <span id="npm"><?php echo htmlspecialchars($data['npm'] ?? '-'); ?></span></p>
+    <p><strong>No. Telepon:</strong> <span id="telp"><?php echo htmlspecialchars($data['kontak'] ?? '-'); ?></span></p>
+    <p><strong>Judul Aduan:</strong> <span id="judul"><?php echo htmlspecialchars($data['judul'] ?? '-'); ?></span></p>
+    <p><strong>Deskripsi:</strong> <span id="deskripsi"><?php echo htmlspecialchars($data['deskripsi'] ?? '-'); ?></span></p>
+    <p><strong>Lokasi:</strong> <span id="lokasi"><?php echo htmlspecialchars($data['lokasi'] ?? '-'); ?></span></p>
+    <p><strong>Bukti Pendukung:</strong>
+        <?php if (!empty($data['bukti'])): ?>
+            <?php $kategori_folder = strtolower($data['kategori']); ?>
+            <a href="bukti/<?= $kategori_folder ?>/<?= htmlspecialchars($data['bukti']) ?>" target="_blank" class="btn btn-lampiran">
+                <i class="fas fa-file me-2"></i>Lihat Lampiran
+            </a>
+            <br>
+            <img src="bukti/<?= $kategori_folder ?>/<?= htmlspecialchars($data['bukti']) ?>" alt="" style="max-width:200px;max-height:120px;margin-top:8px;">
+        <?php else: ?>
+            Tidak ada lampiran
+        <?php endif; ?>
+    </p>
+    <!-- Modal Lampiran -->
     <div class="modal fade" id="lampiranModal" tabindex="-1" aria-labelledby="lampiranModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -75,147 +124,89 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <div id="filePreview">
+                    <?php
+                        if (!empty($bukti_files)):
+                            $kategori = strtolower($data['kategori'] ?? '');
+                            $folder = 'bukti/' . $kategori;
+                            foreach ($bukti_files as $file):
+                                ?>
+                        <img src="<?= $folder ?>/<?= htmlspecialchars($file) ?>" alt="Lampiran" class="img-fluid mb-2" style="max-height:300px;">
+                        <?php
+                            endforeach;
+                        else:
+                            ?>
                         <p>Tidak ada lampiran untuk ditampilkan.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="ppksOnly" style="display: none;">
-        <p><strong>Tanggal Kejadian:</strong> <span id="tanggal"></span></p>
-        <p><strong>Ciri-ciri Pelaku:</strong> <span id="ciri"></span></p>
-        <p><strong>Bentuk Tindak Lanjut yang Diinginkan:</strong> <span id="tindakLanjut"></span></p>
-    </div>
-    <button class="export-btn">EXPORT</button>
-    <hr>
-    <h4 class="judul-edit">Feedback Admin</h4>
-    <div class="custom-select mb-3">
-        <label for="status"><strong>Status</strong></label>
-        <select id="status">
-          <option value="Diproses">Diproses</option>
-          <option value="Selesai">Selesai</option>
-        </select>
-    </div>
-      
-    <div class="form-group mb-3">
-        <label for="komentar"><strong>Tambahkan Deskripsi</strong></label>
-        <textarea id="komentar" class="form-control" rows="3" placeholder="tambahkan komentar"></textarea>
-    </div>
-    
-    <!-- Fitur Upload Foto -->
-    <div class="mb-3">
-        <label for="fileUpload" class="form-label"><strong>Upload Foto</strong></label>
-        <input type="file" class="form-control" id="fileUpload" accept="image/*" onchange="previewImage(event)">
-    </div>
-    <div class="mb-3">
-        <img id="uploadedImage" src="" alt="Uploaded Image" class="img-fluid" style="display: none; max-width: 100%;">
-    </div>
-    
-    <div style="display: flex; justify-content: space-between; margin-top: 15px;">
-        <button class="btn btn-secondary" style="margin-right: auto;" onclick="window.history.back()">Kembali</button>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-success" onclick="simpan()">Simpan</button> 
-            <button class="btn btn-primary" onclick="kirim()">Kirim</button>
+        
+        <?php if (strtolower($data['kategori'] ?? '') === "ppks"): ?>
+            <div id="ppksOnly">
+                <p><strong>Tanggal Kejadian:</strong> <span id="tanggal"><?php echo htmlspecialchars($data['tanggal'] ?? '-'); ?></span></p>
+                <p><strong>Ciri-ciri Pelaku:</strong> <span id="pelaku"><?php echo htmlspecialchars($data['pelaku'] ?? '-'); ?></span></p>
+                <p><strong>Bentuk Tindak Lanjut yang Diinginkan:</strong> <span id="tindak_lanjut"><?php echo htmlspecialchars($data['tindak_lanjut'] ?? '-'); ?></span></p>
+            </div>
+        </button>
+        <?php endif; ?>
+        <hr>
+        <h4 class="judul-edit">Feedback Admin</h4>
+        <form method="post">
+            <div class="custom-select mb-3">
+                <label for="status"><strong>Status</strong></label>
+                <select id="status" name="status" class="form-select">
+                    <option value="Diproses" <?= ($data['status'] ?? '') === 'Diproses' ? 'selected' : '' ?>>Diproses</option>
+                    <option value="Selesai" <?= ($data['status'] ?? '') === 'Selesai' ? 'selected' : '' ?>>Selesai</option>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="komentar"><strong>Tambahkan Komentar</strong></label>
+                <textarea id="komentar" name="komentar" class="form-control" rows="3" placeholder="tambahkan komentar"><?= htmlspecialchars($data['komentar_admin'] ?? '') ?></textarea>
+            </div>
+            <!-- Pilihan Foto Bukti -->
+            <div class="mb-3">
+                <label for="pilihBukti" class="form-label"><strong>Pilih Foto Bukti</strong></label>
+                <select id="pilihBukti" class="form-select" onchange="tampilkanBukti()">
+                    <option value="">-- Pilih Foto --</option>
+                    <?php foreach ($bukti_files as $file): ?>
+                        <option value="<?= $folder ?>/<?= htmlspecialchars($file) ?>"><?= htmlspecialchars($file) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="bukti_terpilih" id="bukti_terpilih" value="">
+                </div>
+                <div class="mb-3">
+                    <img id="uploadedImage" src="" alt="Uploaded Image" class="img-fluid" style="display: none; max-width: 100%;">
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                    <button class="btn btn-secondary" style="margin-right: auto;" type="button" onclick="window.history.back()">Kembali</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" name="simpan" type="submit">Simpan</button>
+                        <button class="btn btn-primary" name="kirim" type="submit">Kirim</button>
+                        <a href="download_aduan_pdf.php?kategori=<?= $kategori ?>&id=<?= $data['id_pengaduan'] ?>" class="btn btn-primary mb-2" target="_blank">
+                            <i class="fas fa-download"></i> Download PDF
+                        </a>
+            </div>
         </div>
-    </div>
-
-
-
+    </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Ambil parameter dari URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id') || 1; // Gunakan id=1 jika tidak ada parameter id
-
-    // Contoh data untuk kategori PPKS
-    const dummyData = {
-        1: {
-            kategorii: "PPKS",
-            nama: "",
-            npm: "",
-            telp: "081234567890",
-            judul: "Tindakan pelecehan verbal",
-            deskripsi: "Saya mengalami pelecehan verbal saat berada di perpustakaan.",
-            lokasi: "Perpustakaan Kampus A",
-            lampiran: "",
-            tanggal: "2025-05-10",
-            ciri: "Pria, tinggi sekitar 170cm, memakai jaket hitam",
-            tindakLanjut: "Pendampingan psikologis",
-            status: "Diproses",
-            komentar: "Kami sedang menyelidiki laporan Anda."
-        },
-        2: {
-            kategorii: "Akademik",
-            nama: "Jane Doe",
-            npm: "87654321",
-            telp: "082345678901",
-            judul: "Permasalahan administrasi",
-            deskripsi: "Kesalahan pada pengisian KRS.",
-            lokasi: "Gedung Administrasi Kampus B",
-            lampiran: "",
-            status: "Diselesaikan",
-            komentar: "Masalah Anda telah kami selesaikan."
-        }
-    };
-
-    // Ambil data dari dummy berdasarkan ID
-    const data = dummyData[id] || {};
-
-    // Isi konten halaman
-    document.getElementById('kategorii').textContent = data.kategorii || "Tidak ditemukan";
-    document.getElementById('nama').textContent = data.nama || "Tidak ditemukan";
-    document.getElementById('npm').textContent = data.npm || "Tidak ditemukan";
-    document.getElementById('telp').textContent = data.telp || "Tidak tersedia";
-    document.getElementById('judul').textContent = data.judul || "Tidak ditemukan";
-    document.getElementById('deskripsi').textContent = data.deskripsi || "Tidak ada deskripsi";
-    document.getElementById('lokasi').textContent = data.lokasi || "Tidak ada lokasi";
-    document.getElementById('status').value = data.status || "Belum ada status";
-    document.getElementById('komentar').textContent = data.komentar || "Belum ada komentar";
-
-    // Lampiran
-    const filePreview = document.getElementById('filePreview');
-    if (data.lampiran) {
-        const fileType = data.lampiran.split('.').pop().toLowerCase();
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
-            filePreview.innerHTML = `<img src="${data.lampiran}" alt="Lampiran" class="img-fluid">`;
+    // Preview Foto Bukti & set hidden input
+    function tampilkanBukti() {
+        const select = document.getElementById('pilihBukti');
+        const img = document.getElementById('uploadedImage');
+        const hidden = document.getElementById('bukti_terpilih');
+        if (select.value) {
+            img.src = select.value;
+            img.style.display = "block";
+            hidden.value = select.value.split('/').pop(); // hanya nama file
         } else {
-            filePreview.innerHTML = `<a href="${data.lampiran}" target="_blank" class="btn btn-secondary">Unduh Lampiran</a>`;
+            img.style.display = "none";
+            hidden.value = "";
         }
     }
-
-    // PPKS Only
-    if (data.kategorii === "PPKS") {
-        document.getElementById('ppksOnly').style.display = "block";
-        document.getElementById('tanggal').textContent = data.tanggal || "Tidak ada tanggal";
-        document.getElementById('ciri').textContent = data.ciri || "Tidak ada ciri pelaku";
-        document.getElementById('tindakLanjut').textContent = data.tindakLanjut || "Tidak ada tindak lanjut";
-    }
-
-    // Preview Image Upload
-    function previewImage(event) {
-        const uploadedImage = document.getElementById('uploadedImage');
-        const file = event.target.files[0];
-
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                uploadedImage.src = e.target.result;
-                uploadedImage.style.display = "block";
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-    function simpan() {
-        alert("Data berhasil disimpan!");
-    }
-    function kirim() {
-        alert("Data berhasil dikirim!");
-    }
-    </script>
 </script>
 </body>
 </html>

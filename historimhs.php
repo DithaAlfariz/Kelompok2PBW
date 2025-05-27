@@ -1,3 +1,12 @@
+<?php
+session_start();
+include 'koneksi.php';
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+$user_id = $_SESSION['user_id'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,33 +16,40 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="histori min-vh-100 d-flex flex-column">
+<body class="min-vh-100 d-flex flex-column">
     
 <?php include 'navbar.php'; ?>
 
 <h1 class="judul-histori">HISTORI ADUAN</h1>
 
 <div class="container list-histori mt-4">
-        <div class="history-item">
-            <span><strong>Judul Aduan 1</strong></span>
-            <span>Tanggal Pengaduan: 10-05-2025</span>
-            <a href="detailhistorimhs.php?id=1" class="detail-link">Detail</a>
+<?php
+// Ambil data dari tabel history, gunakan id_pengaduan sebagai primary key
+$query = "SELECT id_pengaduan, judul, kategori, created_at FROM history WHERE user_id='$user_id' ORDER BY created_at DESC";
+$result = mysqli_query($conn, $query);
+
+$aduan = [];
+while ($row = mysqli_fetch_assoc($result)) $aduan[] = $row;
+?>
+<?php if (count($aduan) == 0): ?>
+    <div class="history-item">Belum ada aduan.</div>
+<?php else: ?>
+    <?php foreach ($aduan as $row): ?>
+        <div class="history-item d-flex justify-content-between align-items-center">
+            <div>
+                <span>
+                    <span class="badge bg-info text-dark ms-2"><?= ucfirst($row['kategori']) ?></span>
+                    <strong><?= htmlspecialchars($row['judul']) ?></strong>
+                </span><br>
+                <span>Tanggal Pengaduan: <?= date('d-m-Y H:i', strtotime($row['created_at'])) ?></span>
+            </div>
+            <div>
+                <a href="detailhistorimhs.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id_pengaduan'] ?>" class="detail-link btn btn-primary btn-sm">Detail</a>
+                <a href="hapus_pengaduan.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id_pengaduan'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+            </div>
         </div>
-        <div class="history-item">
-            <span><strong>Judul Aduan 2</strong></span>
-            <span>Tanggal Pengaduan: 11-05-2025</span>
-            <a href="detailhistorimhs.php?id=2" class="detail-link">Detail</a>
-        </div>
-        <div class="history-item">
-            <span><strong>Judul Aduan 3</strong></span>
-            <span>Tanggal Pengaduan: 12-05-2025</span>
-            <a href="detailhistorimhs.php?id=3" class="detail-link">Detail</a>
-        </div>
-        <div class="history-item">
-            <span><strong>Judul Aduan 4</strong></span>
-            <span>Tanggal Pengaduan: 13-05-2025</span>
-            <a href="detailhistorimhs.php?id=4" class="detail-link">Detail</a>
-        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
 </div>
 
 <footer class="footer-custom mt-auto">

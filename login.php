@@ -1,3 +1,50 @@
+<?php
+session_start();
+require 'koneksi.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = mysqli_real_escape_string($conn, $_POST["email"]);
+    $password = mysqli_real_escape_string($conn, $_POST["password"]);
+
+    $query_sql = "SELECT * FROM table_user WHERE email = '$email' AND password = '$password'";
+    $result = mysqli_query($conn, $query_sql);
+
+    if (isset($_POST['ajax']) && $_POST['ajax'] == '1') {
+        header('Content-Type: application/json');
+        if (mysqli_num_rows($result) > 0) {
+            $user = mysqli_fetch_assoc($result);
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_email'] = $user['email'];
+            $_SESSION['role'] = $user['role'];
+            echo json_encode(['success' => true, 'role' => $user['role']]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+        exit;
+    } else {
+        if (mysqli_num_rows($result) > 0) {
+            $user = mysqli_fetch_assoc($result);
+            // Simpan data session
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_email'] = $user['email'];
+            $_SESSION['role'] = $user['role'];
+            $user_id = $user['id'];
+
+            // Redirect berdasarkan role
+            if ($user['role'] === 'admin') {
+                header("Location: admin-uaspbw/1-menuaduan.php?user_id=" . urlencode($user_id));
+            } else {
+                header("Location: homemhs.php?user_id=" . urlencode($user_id));
+            }
+            exit;
+        } else {
+            echo "<center><h1>Email atau Password Anda Salah. Silahkan Coba Login Kembali.</h1>
+                    <button><strong><a href='login.php'>Login</a></strong></button></center>";
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +54,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="js/script.js">
+    <link rel="stylesheet" href="script.js">
 </head>
 
 <body class="login-page">
@@ -27,7 +74,7 @@
                 <h3 class="text-light fw-semibold mb-2 text-center">Welcome,</h3>
                 <p class="text-white-50 text-center">Don't have an account? <a href="register.php" class="text-decoration-none text-acsent">Create Your Account.</a></p>
 
-                <form class="mt-4" method="POST" action="javascript:void(0);">
+                <form class="mt-4" method="POST" action="">
                     <div class="mb-3">
                         <input type="email" name="email" class="form-control form-control-lg custom-input" placeholder="Email" required>
                     </div>

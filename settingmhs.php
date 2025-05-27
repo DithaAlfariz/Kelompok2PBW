@@ -1,3 +1,73 @@
+<?php
+require 'koneksi.php';
+session_start();
+
+$user_id = $_SESSION['user_id'] ?? 0;
+
+// Ambil data user dari table_user
+$user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM table_user WHERE id='$user_id'"));
+
+// Ambil data setting akun
+$setting = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM setting_akun WHERE user_id='$user_id'"));
+
+// Jika belum ada data di setting_akun, insert default
+if (!$setting && $user) {
+    $username = $user['username'];
+    $email = $user['email'];
+    $full_name = '';
+    $department = '';
+    $npm = '';
+    $password = $user['password'];
+    mysqli_query($conn, "INSERT INTO setting_akun (user_id, username, email, password, full_name, department, npm) VALUES ('$user_id', '$username', '$email', '$password', '', '', '')");
+    $setting = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM setting_akun WHERE user_id='$user_id'"));
+}
+
+$email = $setting['email'] ?? '';
+$username = $setting['username'] ?? '';
+$full_name = $setting['full_name'] ?? '';
+$department = $setting['department'] ?? '';
+$npm = $setting['npm'] ?? '';
+
+// Proses update profil manual
+if (isset($_POST['simpan_profil'])) {
+    $full_name = $_POST['full_name'];
+    $department = $_POST['department'];
+    $npm = $_POST['npm'];
+    mysqli_query($conn, "UPDATE setting_akun SET full_name='$full_name', department='$department', npm='$npm' WHERE user_id='$user_id'");
+    header("Location: settingmhs.php?success=profil");
+    exit;
+}
+
+// Proses update email
+if (isset($_POST['ubah_email'])) {
+    $email_baru = $_POST['email_baru'];
+    mysqli_query($conn, "UPDATE setting_akun SET email='$email_baru' WHERE user_id='$user_id'");
+    mysqli_query($conn, "UPDATE table_user SET email='$email_baru' WHERE id='$user_id'");
+    $email = $email_baru;
+    header("Location: settingmhs.php?success=email");
+    exit;
+}
+
+// Proses update password
+if (isset($_POST['ubah_password'])) {
+    $password_lama = $_POST['password_lama'];
+    $password_baru = $_POST['password_baru'];
+    $konfirmasi = $_POST['konfirmasi_password'];
+
+    if (password_verify($password_lama, $setting['password'])) {
+        if ($password_baru === $konfirmasi) {
+            $hash = password_hash($password_baru, PASSWORD_DEFAULT);
+            mysqli_query($conn, "UPDATE setting_akun SET password='$hash' WHERE user_id='$user_id'");
+            header("Location: settingmhs.php?success=password");
+            exit;
+        } else {
+            $error = "Konfirmasi password baru tidak cocok!";
+        }
+    } else {
+        $error = "Password lama salah!";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,10 +77,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 <body>
-    
 <?php include 'navbar.php'; ?>
 
 <div class="container main-content mt-5">
@@ -38,47 +106,35 @@
                 <!-- Profil Tab -->
                 <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                     <h5 class="section-title">Profil Pengguna</h5>
-                    <form id="profileForm">
-                        <div class="text-center mb-5">
-                            <div class="profile-image-container">
-                                <img src="img/icons8-test-account-48.png" alt="Profile" class="profile-image" id="profileImage">
-                                <label for="profileImageInput" class="image-upload-btn">
-                                    <i class="fas fa-camera"></i>
-                                </label>
-                                <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
-                            </div>
-                        </div>
-                        
+                    <?php if (isset($_GET['success']) && $_GET['success'] == 'profil'): ?>
+                        <div class="alert alert-success">Profil berhasil diperbarui!</div>
+                    <?php endif; ?>
+                    <form method="POST">
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3">
                                 <label for="fullName" class="form-label-setting">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="fullName" placeholder="Masukkan nama lengkap" required>
+                                <input type="text" class="form-control" id="fullName" name="full_name" value="<?= htmlspecialchars($full_name) ?>" placeholder="Masukkan nama lengkap" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label-setting">Username <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="username" placeholder="Masukkan username" required>
+                                <input type="text" class="form-control" id="username" value="<?= htmlspecialchars($username) ?>" disabled readonly>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="department" class="form-label-setting">Jurusan <span class="text-danger">*</span></label>
-                                <select class="form-select" id="department" required>
-                                    <option value="" selected disabled>Pilih Jurusan</option>
-                                    <option value="Informatika">Informatika</option>
-                                    <option value="Sistem Informasi">Sistem Informasi</option>
-                                </select>
+                                <input type="text" class="form-control" id="department" name="department" value="<?= htmlspecialchars($department) ?>" placeholder="Jurusan" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="npm" class="form-label-setting">NPM <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="npm" placeholder="Masukkan NPM" required>
+                                <input type="text" class="form-control" id="npm" name="npm" value="<?= htmlspecialchars($npm) ?>" placeholder="Masukkan NPM" required>
                             </div> 
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label-setting">Email</label>
-                                <input type="email" class="form-control" id="email" placeholder="email@example.com" disabled readonly>
+                                <input type="email" class="form-control" id="email" value="<?= htmlspecialchars($email) ?>" disabled readonly>
                                 <small class="text-muted">Email hanya dapat diubah melalui menu Akun</small>
                             </div>                       
                         </div>
-                        
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <button type="submit" class="btn btn-confirm">
+                            <button type="submit" name="simpan_profil" class="btn btn-confirm">
                                 <i class="fas fa-save me-2"></i> Simpan Perubahan
                             </button>
                         </div>
@@ -93,17 +149,20 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <h6 class="card-title mb-3">Ubah Email</h6>
-                            <form id="emailForm">
+                            <?php if (isset($_GET['success']) && $_GET['success'] == 'email'): ?>
+                                <div class="alert alert-success">Email berhasil diubah!</div>
+                            <?php endif; ?>
+                            <form method="POST">
                                 <div class="mb-3">
                                     <label for="currentEmail" class="form-label-setting">Email Saat Ini</label>
-                                    <input type="email" class="form-control" id="currentEmail" value="user@example.com" disabled readonly>
+                                    <input type="email" class="form-control" id="currentEmail" value="<?= htmlspecialchars($email) ?>" disabled readonly>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newEmail" class="form-label-setting">Email Baru</label>
-                                    <input type="email" class="form-control" id="newEmail" placeholder="Masukkan email baru" required>
+                                    <input type="email" class="form-control" id="newEmail" name="email_baru" placeholder="Masukkan email baru" required>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="submit" class="btn btn-confirm">
+                                    <button type="submit" name="ubah_email" class="btn btn-confirm">
                                         <i class="fas fa-envelope me-2"></i> Ubah Email
                                     </button>
                                 </div>
@@ -115,21 +174,27 @@
                     <div class="card">
                         <div class="card-body">
                             <h6 class="card-title mb-3">Ubah Password</h6>
-                            <form id="passwordForm">
+                            <?php if (isset($_GET['success']) && $_GET['success'] == 'password'): ?>
+                                <div class="alert alert-success">Password berhasil diubah!</div>
+                            <?php endif; ?>
+                            <?php if (!empty($error)): ?>
+                                <div class="alert alert-danger"><?= $error ?></div>
+                            <?php endif; ?>
+                            <form method="POST">
                                 <div class="mb-3">
                                     <label for="currentPassword" class="form-label-setting">Password Saat Ini</label>
-                                    <input type="password" class="form-control" id="currentPassword" placeholder="Masukkan password saat ini" required>
+                                    <input type="password" class="form-control" id="currentPassword" name="password_lama" placeholder="Masukkan password saat ini" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newPassword" class="form-label-setting">Password Baru</label>
-                                    <input type="password" class="form-control" id="newPassword" placeholder="Masukkan password baru" required>
+                                    <input type="password" class="form-control" id="newPassword" name="password_baru" placeholder="Masukkan password baru" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="confirmPassword" class="form-label-setting">Konfirmasi Password Baru</label>
-                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Konfirmasi password baru" required>
+                                    <input type="password" class="form-control" id="confirmPassword" name="konfirmasi_password" placeholder="Konfirmasi password baru" required>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="submit" class="btn btn-confirm">
+                                    <button type="submit" name="ubah_password" class="btn btn-confirm">
                                         <i class="fas fa-key me-2"></i> Ubah Password
                                     </button>
                                 </div>
@@ -145,84 +210,40 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Automatically fill in profile data (simulate fetching from server)
-    document.getElementById('fullName').value = "M. Rafly";
-    document.getElementById('username').value = "rafly123";
-    document.getElementById('department').value = "Informatika";
-    document.getElementById('npm').value = "123456789";
-    document.getElementById('email').value = "user@example.com";
-    document.getElementById('currentEmail').value = "user@example.com";
-    
-    // Handle profile image upload
+    // Tab switching
+    const profileTab = document.getElementById('profile-tab');
+    const accountTab = document.getElementById('account-tab');
+    const profilePane = document.getElementById('profile');
+    const accountPane = document.getElementById('account');
+
+    profileTab.addEventListener('click', function() {
+        profileTab.classList.add('active');
+        accountTab.classList.remove('active');
+        profilePane.classList.add('show', 'active');
+        accountPane.classList.remove('show', 'active');
+    });
+    accountTab.addEventListener('click', function() {
+        accountTab.classList.add('active');
+        profileTab.classList.remove('active');
+        accountPane.classList.add('show', 'active');
+        profilePane.classList.remove('show', 'active');
+    });
+
+    // Handle profile image upload (optional, demo only)
     const profileImageInput = document.getElementById('profileImageInput');
     const profileImage = document.getElementById('profileImage');
-    
-    profileImageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                profileImage.src = e.target.result;
+    if (profileImageInput) {
+        profileImageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileImage.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
             }
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // Form Handling
-    const profileForm = document.getElementById('profileForm');
-    const emailForm = document.getElementById('emailForm');
-    const passwordForm = document.getElementById('passwordForm');
-    
-    profileForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Validate form
-        if (this.checkValidity()) {
-            // Show success message (in a real app, you would save to backend here)
-            alert("Profil berhasil diperbarui!");
-        } else {
-            // Trigger browser's default validation
-            this.reportValidity();
-        }
-    });
-    
-    emailForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Validate form
-        if (this.checkValidity()) {
-            // Show success message (in a real app, you would save to backend here)
-            alert("Email berhasil diperbarui!");
-            document.getElementById('currentEmail').value = document.getElementById('newEmail').value;
-            document.getElementById('email').value = document.getElementById('newEmail').value;
-            document.getElementById('newEmail').value = '';
-        } else {
-            // Trigger browser's default validation
-            this.reportValidity();
-        }
-    });
-    
-    passwordForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        // Check if passwords match
-        if (newPassword !== confirmPassword) {
-            alert("Password baru dan konfirmasi password tidak cocok!");
-            return;
-        }
-        
-        // Validate form
-        if (this.checkValidity()) {
-            // Show success message (in a real app, you would save to backend here)
-            alert("Password berhasil diperbarui!");
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        } else {
-            // Trigger browser's default validation
-            this.reportValidity();
-        }
-    });
+        });
+    }
 });
 </script>
 </body>
