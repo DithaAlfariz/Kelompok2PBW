@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include 'navbar.php'; ?>
 
 
-<div class="container form-content mt-5 pt-5">
+<div class="container form-content mt-5 mb-5 pt-5">
     <blockquote class="blockquote text-center">
         <p>“Berani bersuara untuk perubahan! Kami menjamin keamanan dan kerahasiaan setiap pengaduan yang anda sampaikan.”</p>
     </blockquote>

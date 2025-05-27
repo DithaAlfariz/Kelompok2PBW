@@ -72,12 +72,10 @@ if (!$data) {
     <hr>
     <div class="feedback-section">
         <h4>Feedback Admin</h4>
-        <p><strong>Status:</strong> <?= htmlspecialchars($data['status'] ?? '-') ?></p>
+        <p><strong>Status:</strong> <span class="badge bg-status"><?= htmlspecialchars($data['status'] ?? '-') ?></span></p>
         <p><strong>Komentar Admin:</strong> <?= nl2br(htmlspecialchars($data['komentar'] ?? '-')) ?></p>
     </div>
     <?php endif; ?>
-
-    <hr>
     
     <a href="historimhs.php" class="back-link">Kembali ke Histori</a>
 </div>

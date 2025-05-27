@@ -9,6 +9,7 @@ session_start();
     <title>Pengaduan - SiLapor!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsif.css">
 </head>
 <body class="pengaduan min-vh-100 d-flex flex-column">
     

@@ -174,20 +174,20 @@ if (!empty($data['bukti'])) {
                         <?php endforeach; ?>
                     </select>
                     <input type="hidden" name="bukti_terpilih" id="bukti_terpilih" value="">
-                </div>
-                <div class="mb-3">
-                    <img id="uploadedImage" src="" alt="Uploaded Image" class="img-fluid" style="display: none; max-width: 100%;">
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
-                    <button class="btn btn-secondary" style="margin-right: auto;" type="button" onclick="window.history.back()">Kembali</button>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-success" name="simpan" type="submit">Simpan</button>
-                        <button class="btn btn-primary" name="kirim" type="submit">Kirim</button>
-                        <a href="download_aduan_pdf.php?kategori=<?= $kategori ?>&id=<?= $data['id_pengaduan'] ?>" class="btn btn-primary mb-2" target="_blank">
-                            <i class="fas fa-download"></i> Download PDF
-                        </a>
             </div>
-        </div>
+            <div class="mb-3">
+                <img id="uploadedImage" src="" alt="Uploaded Image" class="img-fluid" style="display: none; max-width: 100%;">
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                <button class="btn btn-secondary" style="margin-right: auto;" type="button" onclick="window.history.back()">Kembali</button>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-success" name="simpan" type="submit">Simpan</button>
+                    <button class="btn btn-primary" name="kirim" type="submit">Kirim</button>
+                    <a href="download_aduan_pdf.php?kategori=<?= $kategori ?>&id=<?= $data['id_pengaduan'] ?>" class="btn btn-primary mb-2" target="_blank">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                </div>
+            </div>
     </form>
 </div>
 

@@ -10,7 +10,7 @@ if ($user_id) {
     }
 }
 ?>
-<link rel="stylesheet" href="css/navadmin.css">
+<link rel="stylesheet" href="css/nav.css">
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand text-white fw-bold" href="#">SiLapor!</a>
@@ -23,7 +23,7 @@ if ($user_id) {
                     <a class="nav-link" href="1-menuaduan.php?user_id=<?= urlencode($user_id) ?>" id="pengaduan-link">Aduan</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="2-menupengumuman.php?user_id=<?= urlencode($user_id) ?>" id="history-link">Pengumuman</a>
+                    <a class="nav-link" href="2-menupengumuman.php?user_id=<?= urlencode($user_id) ?>" id="pengumuman-link">Pengumuman</a>
                 </li>
             </ul>
             <div class="dropdown">

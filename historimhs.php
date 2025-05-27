@@ -15,6 +15,7 @@ $user_id = $_SESSION['user_id'];
     <title>History - SiLapor!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsif.css">
 </head>
 <body class="min-vh-100 d-flex flex-column">
     
@@ -44,8 +45,7 @@ while ($row = mysqli_fetch_assoc($result)) $aduan[] = $row;
                 <span>Tanggal Pengaduan: <?= date('d-m-Y H:i', strtotime($row['created_at'])) ?></span>
             </div>
             <div>
-                <a href="detailhistorimhs.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id_pengaduan'] ?>" class="detail-link btn btn-primary btn-sm">Detail</a>
-                <a href="hapus_pengaduan.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id_pengaduan'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+                <a href="detailhistorimhs.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id_pengaduan'] ?>" class="detail-link btn btn-sm">Detail</a>
             </div>
         </div>
     <?php endforeach; ?>
