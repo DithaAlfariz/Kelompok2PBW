@@ -527,7 +527,7 @@ body.histori{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: white;
+    background-color: #d7faff;
     margin: 8px 0;
     padding: 6px 10px;
     border-radius: 5px;
@@ -539,6 +539,16 @@ body.histori{
     font-size: 14px;
 }
 
+.history-item .badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.history-item .tgl-aduan{
+    font-size: 12px;
+}
+
+
 .detail-link { 
     /* button untuk ke detail histori */
     text-decoration: none;
@@ -549,6 +559,7 @@ body.histori{
     border-radius: 5px;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
+
 .detail-link:hover {
     background-color: var(--secondary-color);
     color: white;
@@ -608,6 +619,17 @@ body.detail-histori{
 }
 .back-link:hover {
     background-color: #5d959e;
+}
+
+.feedback-section span {
+    font-size: 16px;
+}
+
+.feedback-section .badge {
+    padding: 5px 10px;
+    border-radius: 10px;
+    background-color: #ffecb3;
+    color: #795548;
 }
 
 /* Footer Styling copyright kelompok 2 */
