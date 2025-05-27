@@ -53,10 +53,10 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
     <link rel="stylesheet" href="css/2-menupengumuman.css">
 </head>
 <main class="flex-grow-1">
-<body class="pengumuman">
+<body class="pengumuman min-vh-100 d-flex flex-column">
 <?php include '../navadmin.php'; ?>
 
-<h2 class="fw-bold">Pengumuman</h2>
+<h2 class="judul fw-bold">Pengumuman</h2>
 <div class="container">
     <div class="announcement-container mb-5">
             <div class="filter-container mb-3">
@@ -156,7 +156,7 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
 document.addEventListener('DOMContentLoaded', function() {
     // Tandai menu yang aktif
     const currentPage = 'pengumuman';
-    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById(currentPage + '-link').classList.add('active');
     const selectedKategori = urlParams.get('kategori') || 'Semua';
     
     document.getElementById('kategori').value = selectedKategori;
