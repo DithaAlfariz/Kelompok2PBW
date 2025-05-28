@@ -1,0 +1,17 @@
+{
+    "name": "acer/src",
+    "autoload": {
+        "psr-4": {
+            "Acer\\Src\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MuhammadRafly23100",
+            "email": "mraflyyydwiii@gmail.com"
+        }
+    ],
+    "require": {
+        "mpdf/mpdf": "^8.2"
+    }
+}
