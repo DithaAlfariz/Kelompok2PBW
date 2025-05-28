@@ -1,43 +1,3 @@
-<?php
-session_start();
-include 'koneksi.php';
-
-if (!isset($_SESSION['user_id'])) {
-    die('Anda harus login terlebih dahulu!');
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
-    $nama      = $_POST['name'];
-    $npm       = $_POST['npm'];
-    $kontak    = $_POST['contact'];
-    $judul     = $_POST['judul'];
-    $deskripsi = $_POST['deskripsi'];
-    $lokasi    = $_POST['lokasi'];
-    $user_id   = $_SESSION['user_id'];
-    $kategori  = 'sarana';
-    
-
-    $bukti = '';
-    if (isset($_FILES['bukti']) && $_FILES['bukti']['error'] == 0) {
-        $target_dir = __DIR__ . '/bukti/sarana/';
-        if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
-        $bukti = time() . '_' . basename($_FILES["bukti"]["name"]);
-        move_uploaded_file($_FILES["bukti"]["tmp_name"], $target_dir . $bukti);
-    }
-
-    $sql = "INSERT INTO history 
-        (user_id, nama, npm, kontak, judul, deskripsi, lokasi, bukti, kategori)
-        VALUES 
-        ('$user_id', '$nama', '$npm', '$kontak', '$judul', '$deskripsi', '$lokasi', '$bukti', '$kategori')";
-
-    if (mysqli_query($conn, $sql)) {
-        echo "<script>alert('Pengaduan berhasil dikirim!');window.location='saranapmhs.php';</script>";
-    } else {
-        echo "<script>alert('Gagal mengirim pengaduan!');</script>";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,13 +6,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     <title>Sarana - SiLapor!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 <body class="pengaduan">
     
 <?php include 'navbar.php'; ?>
+<?php include 'isiformsarana.php'; ?>
 
-<div class="container form-content mt-5 mb-5 pt-5">
+<div class="container form-content mt-5 pt-5">
     <blockquote class="blockquote text-center">
         <p>“Berani bersuara untuk perubahan! Kami menjamin keamanan dan kerahasiaan setiap pengaduan yang anda sampaikan.”</p>
     </blockquote>
@@ -102,6 +62,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 
 </script>
 </body>
-
-<script></script>
 </html>

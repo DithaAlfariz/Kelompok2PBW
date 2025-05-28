@@ -26,7 +26,7 @@ $user_id = $_SESSION['user_id'];
 <div class="container list-histori mt-4">
 <?php
 // Ambil data dari tabel history, gunakan id_pengaduan sebagai primary key
-$query = "SELECT id_pengaduan, judul, kategori, created_at FROM history WHERE user_id='$user_id' ORDER BY created_at DESC";
+$query = "SELECT id, judul, kategori, created_at FROM history WHERE user_id='$user_id' ORDER BY created_at DESC";
 $result = mysqli_query($conn, $query);
 
 $aduan = [];
@@ -45,7 +45,7 @@ while ($row = mysqli_fetch_assoc($result)) $aduan[] = $row;
                 <span>Tanggal Pengaduan: <?= date('d-m-Y H:i', strtotime($row['created_at'])) ?></span>
             </div>
             <div>
-                <a href="detailhistorimhs.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id_pengaduan'] ?>" class="detail-link btn btn-sm">Detail</a>
+                <a href="detailhistorimhs.php?kategori=<?= $row['kategori'] ?>&id=<?= $row['id'] ?>" class="detail-link btn btn-sm">Detail</a>
             </div>
         </div>
     <?php endforeach; ?>

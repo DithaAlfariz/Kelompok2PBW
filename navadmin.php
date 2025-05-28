@@ -28,7 +28,6 @@ if ($user_id) {
             </ul>
             <div class="dropdown">
                 <a class="dropdown-toggle text-white d-flex align-items-center text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="img/icons8-test-account-48.png" alt="Profile" class="rounded-circle me-2" width="30">
                     <span><?= htmlspecialchars($username ?: 'Admin') ?></span>
                 </a>
                 <ul class="dropdown-menu">
