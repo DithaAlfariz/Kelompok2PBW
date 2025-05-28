@@ -1,47 +1,3 @@
-<?php
-include '../koneksi.php';
-session_start();
-
-$user_id = $_SESSION['user_id'] ?? null;
-// Ambil filter kategori dari GET
-$kategori_terpilih = isset($_GET['kategori']) ? $_GET['kategori'] : 'Semua';
-$status_terpilih = isset($_GET['status']) ? $_GET['status'] : 'Semua';
-
-// Gabungkan filter kategori dan status
-$where = [];
-if ($kategori_terpilih && $kategori_terpilih !== 'Semua') {
-    $kategori_safe = mysqli_real_escape_string($conn, $kategori_terpilih);
-    $where[] = "h.kategori = '$kategori_safe'";
-}
-if ($status_terpilih && $status_terpilih !== 'Semua') {
-    $status_safe = mysqli_real_escape_string($conn, $status_terpilih);
-    $where[] = "d.status = '$status_safe'";
-}
-$where_sql = '';
-if (count($where) > 0) {
-    $where_sql = 'WHERE ' . implode(' AND ', $where);
-}
-
-// Query untuk mengambil semua laporan dengan join ke detail_history
-$query = "
-    SELECT h.*, d.*, h.id_pengaduan AS history_id, u.username, u.email
-    FROM history h
-    LEFT JOIN detail_history d ON h.id_pengaduan = d.id_history
-    LEFT JOIN table_user u ON h.user_id = u.id
-    $where_sql
-    ORDER BY h.created_at DESC
-";
-$result = mysqli_query($conn, $query);
-
-// Query statistik kategori
-$stat_query = "SELECT kategori, COUNT(*) as jumlah FROM history GROUP BY kategori";
-$stat_result = mysqli_query($conn, $stat_query);
-
-$kategori_data = [];
-while ($row = mysqli_fetch_assoc($stat_result)) {
-    $kategori_data[$row['kategori']] = $row['jumlah'];
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,10 +9,46 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
     <link rel="stylesheet" href="css/2-menupengumuman.css">
 </head>
 <main class="flex-grow-1">
-<body class="pengumuman min-vh-100 d-flex flex-column">
-<?php include '../navadmin.php'; ?>
+<body class="pengumuman">
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand text-white fw-bold" href="#">SiLapor!</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="1-menuaduan.php" id="pengaduan-link">Aduan</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="2-menupengumuman.php" id="history-link">Pengumuman</a>
+                </li>
+            </ul>
+            <div class="dropdown">
+                <a class="dropdown-toggle text-white d-flex align-items-center text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span>Admin</span>
+                </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="3-kelolauser.php">
+                                <img src="img/icons8-setting-24.png" alt="Setting Icon" class="me-2" width="20">
+                                Kelola User
+                            </a>
+                        </li>
+                        <li>
+                            <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="#">
+                                <img src="img/icons8-logout-24.png" alt="Setting Icon" class="me-2" width="20">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+    </div>
+</nav>
 
-<h2 class="judul fw-bold">Pengumuman</h2>
+<h2 class="fw-bold">Pengumuman</h2>
 <div class="container">
     <div class="announcement-container mb-5">
             <div class="filter-container mb-3">
@@ -73,10 +65,10 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-2">
             <?php
             // Koneksi ke database
-            $conn = new mysqli("localhost", "root", "", "silapor");
+            $koneksi = new mysqli("localhost", "root", "", "silapor");
 
             // Cek koneksi
-            if ($conn->connect_error) {
+            if ($koneksi->connect_error) {
                 die("Koneksi gagal: " . $koneksi->connect_error);
             }
 
@@ -89,51 +81,54 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
             } else {
                 $sql = "SELECT * FROM pengumuman WHERE kategori = '$kategori' ORDER BY tanggal DESC";
             }
-            $result = $conn->query($sql);
+            $result = $koneksi->query($sql);
             ?>
             <?php if ($result && $result->num_rows > 0): ?>
                 <?php while($row = $result->fetch_assoc()): ?>
                     <div class="col">
-                        <!-- Seluruh card dibungkus <a> agar bisa diklik -->
-                        <a href="5-detailpengumuman.php?id=<?= $row['id']; ?>" style="text-decoration:none;color:inherit;">
-                            <div class="announcement-card h-100" style="cursor:pointer; position:relative;">
-                                <div class="announcement-img">
-                                    <?php if (!empty($row['bukti'])): ?>
-                                        <?php
-                                            $kategori_folder = strtolower(str_replace([' ', '&'], ['_', 'dan'], $row['kategori']));
-                                            $img_path = "bukti/" . $kategori_folder . "/" . htmlspecialchars($row['bukti']);
-                                        ?>
-                                        <img src="<?php echo $img_path; ?>" alt="Bukti" class="announcement-photo img-fluid" style="object-fit:cover; width:100%; height:180px; border-radius:8px;">
-                                    <?php endif; ?>
-                                </div>
-                                <h4 class="announcement-title"><?php echo htmlspecialchars($row['judul']); ?></h4>
-                                <div class="announcement-info">
-                                    <?php
-                                        $kategori_label = [
-                                            'sarana'   => 'Sarana & Prasarana',
-                                            'ppks'     => 'PPKS',
-                                            'akademik' => 'Akademik'
-                                        ];
-                                        $kategori_tampil = isset($kategori_label[strtolower($row['kategori'])]) ? $kategori_label[strtolower($row['kategori'])] : htmlspecialchars($row['kategori']);
-                                    ?>
-                                    <span class="announcement-kategori"><?php echo $kategori_tampil; ?></span>
-                                    <span class="announcement-date">| Diterbitkan: <?php echo date('d/m/Y', strtotime($row['tanggal'])); ?></span>
-                                </div>
-                                <div class="announcement-status">
-                                    <span class="status-label">Status:</span>
-                                    <span class="status-value <?php echo ($row['status'] == 'Diproses') ? 'status-process' : 'status-done'; ?>">
-                                        <?php echo htmlspecialchars($row['status']); ?>
-                                    </span>
-                                </div>
-                                <p class="announcement-desc">
-                                    <?php echo htmlspecialchars($row['komentar']); ?>
-                                </p>
+                        <div class="announcement-card h-100">
+                            <div class="announcement-img">
+                                <?php
+                                    $kategori_folder = strtolower(str_replace(' ', '', $row['kategori']));
+                                    $nama_file = isset($row['bukti']) ? $row['bukti'] : '';
+                                    $imgSrc = (!empty($nama_file) && file_exists(__DIR__."/../bukti/$kategori_folder/$nama_file"))
+                                        ? "../bukti/$kategori_folder/$nama_file"
+                                        : "img/default-image.png";
+                                ?>
+                            <img src="<?php echo $imgSrc; ?>" alt="Bukti" class="announcement-photo">
+                        </div>
+                            <h4 class="announcement-title"><?php echo htmlspecialchars($row['judul']); ?></h4>
+                            <div class="announcement-info">
+                                <?php
+                                    // Mapping kategori database ke label tampilan
+                                    $kategori_label = [
+                                        'sarana'   => 'Sarana & Prasarana',
+                                        'ppks'     => 'PPKS',
+                                        'akademik' => 'Akademik'
+                                    ];
+                                    $kategori_tampil = isset($kategori_label[strtolower($row['kategori'])]) ? $kategori_label[strtolower($row['kategori'])] : htmlspecialchars($row['kategori']);
+                                ?>
+                                <span class="announcement-kategori"><?php echo $kategori_tampil; ?></span>
+                                <span class="announcement-date">| Diterbitkan: <?php echo date('d/m/Y', strtotime($row['tanggal'])); ?></span>
                             </div>
-                        </a>
-                        <!-- Tombol edit dan delete bisa diletakkan di luar <a> agar tidak ikut terklik -->
-                        <div style="margin-top:-40px; margin-bottom:20px;">
-                            <a href="5-detailpengumuman.php?id=<?= $row['id']; ?>" class="btn-edit">✎</a>
-                            <button class="delete-btn" onclick="deletecard(this, <?= $row['id']; ?>)">🗑️</button>
+                            <div class="announcement-status">
+                                <span class="status-label">Status:</span>
+                                <span class="status-value 
+                                    <?php 
+                                        if (strtolower($row['status']) == 'diproses') echo 'status-process';
+                                        else if (strtolower($row['status']) == 'selesai') echo 'status-done';
+                                    ?>">
+                                    <?php echo htmlspecialchars($row['status']); ?>
+                                </span>
+                            </div>
+                            <p class="announcement-desc">
+                                <?php echo htmlspecialchars($row['komentar']); ?>
+                            </p>
+                            <a href="5-detailpengumuman.php?id=<?php echo $row['id']; ?>" class="btn-edit">✎</a>
+                            <form method="POST" action="hapus_pengumuman.php" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengumuman ini?');">
+                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                <button type="submit" class="delete-btn" style="border:none;background:none;padding:0;">🗑️</button>
+                            </form>
                         </div>
                     </div>
                 <?php endwhile; ?>
@@ -156,7 +151,7 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
 document.addEventListener('DOMContentLoaded', function() {
     // Tandai menu yang aktif
     const currentPage = 'pengumuman';
-    document.getElementById(currentPage + '-link').classList.add('active');
+    const urlParams = new URLSearchParams(window.location.search);
     const selectedKategori = urlParams.get('kategori') || 'Semua';
     
     document.getElementById('kategori').value = selectedKategori;
@@ -179,31 +174,6 @@ function filterCards(kategori) {
             card.parentElement.style.display = 'none';
         }
     });
-}
-
-function deletecard(btn, id) {
-    const col = btn.closest('.col'); // Ubah dari tr ke .col agar kartu bisa dihapus
-    const confirmed = confirm('Apakah Anda yakin ingin menghapus pengumuman ini?');
-    if (confirmed) {
-        fetch('hapus_pengumuman.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: id })
-        })
-        .then(response => {
-            if (response.ok) {
-                col.remove(); // Hapus kartu dari tampilan
-            } else {
-                alert('Gagal menghapus pengumuman. Silakan coba lagi.');
-            }
-        })
-        .catch(error => {
-            console.error('Terjadi kesalahan:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi.');
-        });
-    }
 }
 </script>
 </body>
