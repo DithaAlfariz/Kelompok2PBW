@@ -53,14 +53,20 @@ if (isset($_POST['update'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    $query = "UPDATE table_user SET username='$username', email='$email'";
-    if (!empty($password)) {
-        $query .= ", password='$password'";
+    // Cek apakah email sudah dipakai user lain
+    $cek_email = mysqli_query($conn, "SELECT id FROM table_user WHERE email='$email'");
+    if(mysqli_num_rows($cek_email) > 0) {
+        $alert = 'Email sudah terpakai';
+    } else {
+        $query = "UPDATE table_user SET username='$username', email='$email'";
+        if (!empty($password)) {
+            $query .= ", password='$password'";
+        }
+        $query .= " WHERE id='$id' AND role='admin'";
+        mysqli_query($conn, $query);
+        header("Location: 3-kelolauser.php");
+        exit;
     }
-    $query .= " WHERE id='$id' AND role='admin'";
-    mysqli_query($conn, $query);
-    header("Location: 3-kelolauser.php");
-    exit;
 }
 
 // Ambil data admin untuk form edit
@@ -148,5 +154,18 @@ if (isset($_GET['edit'])) {
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php if (isset($alert) && $alert === 'Email sudah terpakai'): ?>
+<script>
+Swal.fire({
+    icon: 'warning',
+    title: 'Email Sudah Terpakai!',
+    text: 'Email sudah terpakai, silakan gunakan email lain.',
+    confirmButtonText: 'OK'
+}).then(() => {
+    window.location.href = '3-kelolauser.php';
+});
+</script>
+<?php endif; ?>
 </body>
 </html>

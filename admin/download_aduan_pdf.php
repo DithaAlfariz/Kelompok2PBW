@@ -4,7 +4,7 @@ include '../koneksi.php';
 session_start();
 if (!isset($_SESSION['user_id'])) exit('Unauthorized');
 $user_id = $_SESSION['user_id'];
-$id = $_GET['id_pengaduan'] ?? $_GET['id'] ?? '';
+$id = $_GET['id_history'] ?? $_GET['id'] ?? '';
 $kategori = $_GET['kategori'] ?? '';
 $data = null;
 
@@ -12,10 +12,19 @@ $data = null;
 // var_dump($id, $kategori, $user_id);
 // exit;
 
-// Ambil data dari tabel history (gunakan id_pengaduan)
-$q = mysqli_query($conn, "SELECT * FROM history WHERE id_pengaduan='$id' AND kategori='$kategori'");
+$q = mysqli_query($conn, "SELECT * FROM history WHERE id='$id' AND kategori='$kategori'");
 $data = mysqli_fetch_assoc($q);
 if (!$data) exit('Data tidak ditemukan');
+
+// Mapping kategori
+$kategori_label = [
+    'sarana'   => 'Sarana & Prasarana',
+    'ppks'     => 'PPKS',
+    'akademik' => 'Akademik'
+];
+$kategori_tampil = isset($kategori_label[strtolower($data['kategori'])]) 
+    ? $kategori_label[strtolower($data['kategori'])] 
+    : ucfirst($data['kategori']);
 
 $html = '
 <style>
@@ -48,7 +57,7 @@ $html = '
 </style>
 <h2 align="center">Detail Aduan</h2>
 <table>
-<tr><td class="label">Kategori</td><td>' . ucfirst($data['kategori']) . '</td></tr>
+<tr><td class="label">Kategori</td><td>' . $kategori_tampil . '</td></tr>
 <tr><td class="label">Nama</td><td>' . htmlspecialchars($data['nama']) . '</td></tr>
 <tr><td class="label">NPM</td><td>' . htmlspecialchars($data['npm']) . '</td></tr>
 <tr><td class="label">No. Telepon</td><td>' . htmlspecialchars($data['kontak']) . '</td></tr>
@@ -62,13 +71,14 @@ $html = '
 // Sertakan gambar bukti pendukung jika ada
 if (!empty($data['bukti'])) {
     $kategori_folder = strtolower($data['kategori']);
-    $imgPath = __DIR__ . "/bukti/$kategori_folder/" . $data['bukti'];
-    if (file_exists($imgPath)) {
-        // Path relatif dari root dokumen web server
-        $imgUrl = "bukti/$kategori_folder/" . $data['bukti'];
+    $imgPath = realpath(__DIR__ . "/../bukti/$kategori_folder/" . $data['bukti']);
+    if ($imgPath && file_exists($imgPath)) {
+        $imgType = pathinfo($imgPath, PATHINFO_EXTENSION);
+        $imgData = base64_encode(file_get_contents($imgPath));
+        $src = 'data:image/' . $imgType . ';base64,' . $imgData;
         $html .= '<div style="text-align:center; margin-top:30px;">
             <b>Lampiran:</b><br>
-            <img src="' . $imgUrl . '" style="max-width:350px; max-height:350px; border:1px solid #ccc; margin-top:10px;">
+            <img src="' . $src . '" style="max-width:350px; max-height:350px; border:1px solid #ccc; margin-top:10px;">
         </div>';
     }
 }

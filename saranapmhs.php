@@ -1,3 +1,18 @@
+<?php
+session_start();
+include 'koneksi.php';
+
+$user_id = $_SESSION['user_id'];
+
+// Ambil data nama dan npm dari tabel setting_akun
+$query = "SELECT full_name, npm FROM setting_akun WHERE user_id = '$user_id' LIMIT 1";
+$result = mysqli_query($conn, $query);
+$userData = mysqli_fetch_assoc($result);
+
+$nama = $userData['full_name'] ?? '';
+$npm = $userData['npm'] ?? '';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,11 +36,11 @@
     <form class="form-container" action="saranapmhs.php" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="name" class="form-label">NAMA</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Jawaban Anda" required>
+            <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($nama); ?>">
         </div>
         <div class="mb-3">
             <label for="npm" class="form-label">NPM</label>
-            <input type="text" class="form-control" id="npm" name="npm" placeholder="Jawaban Anda" required>
+            <input type="text" class="form-control" id="npm" name="npm" value="<?php echo htmlspecialchars($npm); ?>">
         </div>
         <div class="mb-3">
             <label for="contact" class="form-label">Nomor Telepon</label>

@@ -19,6 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     }
 }
 
-header('Location: 2-menupengumuman.php');
+header("Location: 2-menupengumuman.php?hapus=sukses");
 exit;
 ?>

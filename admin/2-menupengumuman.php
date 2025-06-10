@@ -1,3 +1,9 @@
+<?php
+include '../koneksi.php';
+
+$kategori = isset($_GET['kategori']) ? $_GET['kategori'] : 'Semua';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/2-menupengumuman.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <main class="flex-grow-1">
 <body class="pengumuman">
@@ -55,10 +62,10 @@
                 <form method="GET" action="">
                     <label for="kategori"></label>
                     <select name="kategori" id="kategori" onchange="this.form.submit()">
-                        <option value="Semua" selected>Semua</option>
-                        <option value="Sarana & Prasarana">Sarana & Prasarana</option>
-                        <option value="Akademik">Akademik</option>
-                        <option value="PPKS">PPKS</option>
+                        <option value="Semua" <?= ($kategori == 'Semua') ? 'selected' : '' ?>>Semua</option>
+                        <option value="sarana" <?= ($kategori == 'sarana') ? 'selected' : '' ?>>Sarana & Prasarana</option>
+                        <option value="akademik" <?= ($kategori == 'akademik') ? 'selected' : '' ?>>Akademik</option>
+                        <option value="ppks" <?= ($kategori == 'ppks') ? 'selected' : '' ?>>PPKS</option>
                     </select>
                 </form>
             </div>
@@ -125,7 +132,7 @@
                                 <?php echo htmlspecialchars($row['komentar']); ?>
                             </p>
                             <a href="5-detailpengumuman.php?id=<?php echo $row['id']; ?>" class="btn-edit">✎</a>
-                            <form method="POST" action="hapus_pengumuman.php" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengumuman ini?');">
+                            <form method="POST" action="hapus_pengumuman.php" class="form-hapus" style="display:inline;">
                                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                                 <button type="submit" class="delete-btn" style="border:none;background:none;padding:0;">🗑️</button>
                             </form>
@@ -149,32 +156,44 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Tandai menu yang aktif
-    const currentPage = 'pengumuman';
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedKategori = urlParams.get('kategori') || 'Semua';
-    
-    document.getElementById('kategori').value = selectedKategori;
-    
-    filterCards(selectedKategori);
-    
-    document.getElementById('kategori').addEventListener('change', function() {
-        const selectedKategori = this.value;
-        filterCards(selectedKategori);
+    // SweetAlert konfirmasi hapus
+    document.querySelectorAll('.form-hapus').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Pengumuman akan dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
     });
-});
 
-function filterCards(kategori) {
-    const cards = document.querySelectorAll('.announcement-card');
-    cards.forEach(card => {
-        const cardKategori = card.querySelector('.announcement-kategori').textContent;
-        if (kategori === 'Semua' || cardKategori === kategori) {
-            card.parentElement.style.display = 'block';
-        } else {
-            card.parentElement.style.display = 'none';
+    // SweetAlert jika pengumuman berhasil dihapus
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('hapus') === 'sukses') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Pengumuman berhasil dihapus',
+            showConfirmButton: false,
+            timer: 1800
+        });
+        // Hapus parameter dari URL agar tidak muncul lagi saat reload
+        if (window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.delete('hapus');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
         }
-    });
-}
+    }
+});
 </script>
 </body>
 </html>

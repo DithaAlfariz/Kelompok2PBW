@@ -54,10 +54,25 @@ if (isset($_POST['ubah_password'])) {
     $password_baru = $_POST['password_baru'];
     $konfirmasi = $_POST['konfirmasi_password'];
 
-    if (password_verify($password_lama, $setting['password'])) {
+    // Ambil hash password terbaru dari database
+    $user_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT password FROM table_user WHERE id='$user_id'"));
+    $hash_password = $user_row['password'];
+
+    // Verifikasi password lama
+    if (isset($_POST['ubah_password'])) {
+    $password_lama = $_POST['password_lama'];
+    $password_baru = $_POST['password_baru'];
+    $konfirmasi = $_POST['konfirmasi_password'];
+
+    // Ambil password lama dari table_user (tanpa hash)
+    $user_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT password FROM table_user WHERE id='$user_id'"));
+    $password_db = $user_row ? $user_row['password'] : '';
+
+    // Bandingkan password lama secara langsung (plain text)
+    if ($password_db && $password_lama === $password_db) {
         if ($password_baru === $konfirmasi) {
-            $hash = password_hash($password_baru, PASSWORD_DEFAULT);
-            mysqli_query($conn, "UPDATE setting_akun SET password='$hash' WHERE user_id='$user_id'");
+            mysqli_query($conn, "UPDATE setting_akun SET password='$password_baru' WHERE user_id='$user_id'");
+            mysqli_query($conn, "UPDATE table_user SET password='$password_baru' WHERE id='$user_id'");
             header("Location: settingmhs.php?success=password");
             exit;
         } else {
@@ -66,6 +81,7 @@ if (isset($_POST['ubah_password'])) {
     } else {
         $error = "Password lama salah!";
     }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -175,10 +191,10 @@ if (isset($_POST['ubah_password'])) {
                         <div class="card-body">
                             <h6 class="card-title mb-3">Ubah Password</h6>
                             <?php if (isset($_GET['success']) && $_GET['success'] == 'password'): ?>
-                                <div class="alert alert-success">Password berhasil diubah!</div>
+                                <div class="alert alert-success alert-dismissible fade show">Password berhasil diubah!</div>
                             <?php endif; ?>
                             <?php if (!empty($error)): ?>
-                                <div class="alert alert-danger"><?= $error ?></div>
+                                <div class="alert alert-danger alert-dismissible fade show"><?= $error ?></div>
                             <?php endif; ?>
                             <form method="POST">
                                 <div class="mb-3">

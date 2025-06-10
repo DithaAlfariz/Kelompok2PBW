@@ -52,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kirim'])) {
     // Cek apakah id_history sudah ada di tabel pengumuman
     $cek = mysqli_query($conn, "SELECT id FROM pengumuman WHERE id_history = $id");
     if (mysqli_num_rows($cek) > 0) {
-        // Sudah ada, tampilkan pesan error (bisa pakai alert atau variabel PHP)
         echo "<script>alert('Pengumuman untuk aduan ini sudah pernah dikirim!');</script>";
     } else {
         $update = "UPDATE detail_history SET status ='$status', komentar='$komentar', pengumuman='aktif' WHERE id_history=$id";
@@ -77,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kirim'])) {
                              VALUES ($id, '$judul', '$kategori', '$tanggal', '$status', '$komentar', '$bukti_terpilih')";
         mysqli_query($conn, $insertPengumuman);
 
-        // Redirect atau tampilkan pesan sukses
-        header("Location: 1-menuaduan.php");
+        // Redirect dengan parameter sukses
+        header("Location: 4-detailaduan.php?id=$id&success=kirim");
         exit;
     }
 }
@@ -107,6 +106,7 @@ if (!empty($data['bukti'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/4-detail.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="detailaduan">
 <nav class="navbar navbar-expand-lg">
@@ -204,8 +204,8 @@ if (!empty($data['bukti'])) {
         <p><strong>Bentuk Tindak Lanjut yang Diinginkan:</strong> <span id="tindak_lanjut"><?php echo htmlspecialchars($data['tindak_lanjut'] ?? '-'); ?></span></p>
     </div>
     <?php endif; ?>
-    <a href="download_aduan_pdf.php?kategori=<?= $kategori ?>&id=<?= $data['id_pengaduan'] ?>" class="btn btn-primary mb-2" target="_blank">
-            <i class="fas fa-download"></i> Export
+    <a href="download_aduan_pdf.php?kategori=<?= htmlspecialchars($data['kategori'] ?? '') ?>&id=<?= $data['id_history'] ?>" class="btn btn-primary mb-2" target="_blank">
+            <i class="fas fa-download"></i>Export
     </a>
     <hr>
     <h4 class="judul-edit">Feedback Admin</h4>
@@ -261,6 +261,22 @@ if (!empty($data['bukti'])) {
             hidden.value = "";
         }
     }
+
+    // SweetAlert2 untuk sukses kirim pengumuman
+    <?php if (isset($_GET['success']) && $_GET['success'] === 'kirim'): ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Pengumuman berhasil terkirim',
+        showConfirmButton: false,
+        timer: 1800
+    });
+    // Hapus parameter dari URL setelah tampil
+    if (window.history.replaceState) {
+        const url = new URL(window.location);
+        url.searchParams.delete('success');
+        window.history.replaceState({}, document.title, url.pathname + url.search);
+    }
+    <?php endif; ?>
 </script>
 </body>
 </html>

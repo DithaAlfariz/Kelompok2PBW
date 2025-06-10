@@ -77,7 +77,7 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
                             </a>
                         </li>
                         <li>
-                            <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="#">
+                            <a id="logoutBtn" class="dropdown-item d-flex align-items-center" href="../logout.php">
                                 <img src="img/icons8-logout-24.png" alt="Setting Icon" class="me-2" width="20">
                                 Logout
                             </a>
@@ -93,9 +93,9 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
 </div>
 <h2 class="fw-bold">Kelola Aduan Masuk</h2>
 <div class="container mt-4">
-    <section class="tampilan-aduan">
-        <div class="filter-container mb-3">
-            <form method="GET" action="">
+  <section class="tampilan-aduan">
+    <div class="filter-container mb-3">
+      <form method="GET" action="">
                 <label for="kategori"></label>
                 <select name="kategori" id="kategori" onchange="this.form.submit()">
                     <option value="Semua" <?= $kategori_terpilih == 'Semua' ? 'selected' : '' ?>>Semua Kategori</option>
@@ -110,9 +110,10 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
                     <option value="Selesai" <?= $status_terpilih == 'Selesai' ? 'selected' : '' ?>>Selesai</option>
                 </select>
             </form>
-        </div>
-        <table>
-            <tr>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <tr>
                 <th>No.</th>
                 <th>Judul Aduan</th>
                 <th>Kategori</th>
@@ -148,8 +149,9 @@ while ($row = mysqli_fetch_assoc($stat_result)) {
                 </td>
             </tr>
             <?php endwhile; ?>
-        </table>
-    </section>
+      </table>
+    </div>
+  </section>
 </div>
 </main>
 

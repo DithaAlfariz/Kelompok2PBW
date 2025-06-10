@@ -29,7 +29,7 @@
         <!-- Nomor Telepon / Email -->
         <div class="mb-3">
             <label for="contact" class="form-label">Nomor Telepon <i>(isi jika ingin ditindak lanjut)</i></label>
-            <input type="text" class="form-control" id="contact" name="contact" placeholder="Jawaban Anda" required>
+            <input type="text" class="form-control" id="contact" name="contact" placeholder="Jawaban Anda">
         </div>
 
         <!-- Judul Aduan -->

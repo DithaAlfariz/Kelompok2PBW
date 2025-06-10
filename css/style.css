@@ -398,6 +398,11 @@ body.homepage {
   color: #795548;
 }
 
+.status-selesai {
+  background-color: #00d00a;
+  color: #fff;
+}
+
 .announcement-desc {
   font-size: 14px;
   color: #555;

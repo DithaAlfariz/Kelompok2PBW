@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     }
 
     // Refresh data
-    header("Location: 5-detailpengumuman.php?id=$id");
+    header("Location: 2-menupengumuman.php?id=$id");
     exit;
 }
 ?>

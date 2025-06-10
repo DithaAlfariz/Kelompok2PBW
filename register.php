@@ -1,3 +1,56 @@
+<?php
+require 'koneksi.php';
+
+// Fungsi untuk generate random id unik (misal 10 karakter alfanumerik)
+function generateRandomId($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomId = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomId .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomId;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST["username"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $repeat_password = $_POST["repeat_password"];
+
+    if ($password !== $repeat_password) {
+        echo "<script>alert('Password dan Repeat Password tidak sama!');window.location.href='register.php';</script>";
+        exit;
+    }
+
+    // Cek apakah email sudah terdaftar
+    $cek_email = mysqli_query($conn, "SELECT email FROM table_user WHERE email = '$email'");
+    if (mysqli_num_rows($cek_email) > 0) {
+        $proses = 'email_exists';
+        $message = 'Email sudah terdaftar!';
+    } else {
+        // Generate random id dan pastikan unik
+        do {
+            $id = generateRandomId();
+            $check = mysqli_query($conn, "SELECT id FROM table_user WHERE id = '$id'");
+        } while(mysqli_num_rows($check) > 0);
+
+        // Set role as 'mahasiswa' automatically
+        $role = 'mahasiswa';
+
+        // Simpan id, email, dan password ke database dengan role
+        $query_sql = "INSERT INTO table_user (id, username, email, password, role) VALUES ('$id', '$username', '$email', '$password', '$role')";
+
+        if (mysqli_query($conn, $query_sql)) {
+            $proses = 'success';
+            $message = 'Registrasi Berhasil!';
+        } else {
+            $proses = 'error';
+            $message = 'Registrasi Gagal!';
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +78,11 @@
                 <h3 class="text-light fw-semibold mb-2 text-center">Create Account,</h3>
                 <p class="text-white-50 text-center">Have an account? <a href="login.php" class="text-decoration-none text-acsent">Sign In</a></p>
 
-                <form class="mt-4" method="POST" action="#">
+                <form class="mt-4" method="POST" action="">
+                    <div class="mb-3">
+                      <input type="username" name="username" id="username" class="form-control form-control-lg custom-input" placeholder="Username" required />
+                    </div>
+
                     <div class="mb-3">
                       <input type="email" name="email" id="email" class="form-control form-control-lg custom-input" placeholder="Email" required />
                     </div>
@@ -40,13 +97,6 @@
             
                     <button type="submit" class="btn btn-blue w-100 rounded-pill fw-semibold text-light">Create Account</button>
                 </form>
-
-                <div class="text-center my-3 text-white-50">— Or —</div>
-                <div class="text-center">
-                    <button class="btn btn-outline-light rounded-square shadow-sm">
-                        <img src="img/icons8-google-48.png" alt="Google Login" style="width: 24px;">
-                    </button>
-                </div>
             </div> 
         </div>
 
@@ -55,5 +105,40 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <?php if (isset($proses) && $proses === 'success'): ?>
+    <script>
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: '<?php echo $message; ?>',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = 'login.php';
+      });
+    </script>
+  <?php elseif (isset($proses) && $proses === 'error'): ?>
+    <script>
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: '<?php echo $message; ?>',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = 'register.php';
+      });
+    </script>
+  <?php elseif (isset($proses) && $proses === 'email_exists'): ?>
+  <script>
+    Swal.fire({
+      icon: 'warning',
+      title: 'Email sudah terdaftar',
+      text: '<?php echo $message; ?>',
+      confirmButtonText: 'OK'
+    }).then(() => {
+      window.location.href = 'register.php';
+    });
+  </script>
+<?php endif; ?>
 </body>
 </html>

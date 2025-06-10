@@ -1,5 +1,8 @@
 <?php
-// session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'koneksi.php';
 
 // Ambil user_id dari session login

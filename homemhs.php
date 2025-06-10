@@ -1,11 +1,18 @@
+<?php
+include 'koneksi.php';
+
+$kategori = isset($_GET['kategori']) ? $_GET['kategori'] : 'Semua';
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
     <title>Home - SiLapor!</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="admin/css/2-menupengumuman.css">
     <link rel="stylesheet" href="script.js">
     <?php
     include 'navbar.php';
@@ -24,10 +31,10 @@
                 <form method="GET" action="">
                     <label for="kategori"></label>
                     <select name="kategori" id="kategori" onchange="this.form.submit()">
-                        <option value="Semua" selected>Semua</option>
-                        <option value="Sarana & Prasarana">Sarana & Prasarana</option>
-                        <option value="Akademik">Akademik</option>
-                        <option value="PPKS">PPKS</option>
+                        <option value="Semua" <?= ($kategori == 'Semua') ? 'selected' : '' ?>>Semua</option>
+                        <option value="sarana" <?= ($kategori == 'sarana') ? 'selected' : '' ?>>Sarana & Prasarana</option>
+                        <option value="akademik" <?= ($kategori == 'akademik') ? 'selected' : '' ?>>Akademik</option>
+                        <option value="ppks" <?= ($kategori == 'ppks') ? 'selected' : '' ?>>PPKS</option>
                     </select>
                 </form>
             </div>
@@ -112,6 +119,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    //menandai menu navbar yang aktif
     const currentPage = 'home';
     document.getElementById(currentPage + '-link').classList.add('active');
     
@@ -128,20 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function filterCards(kategori) {
-    
-    const cards = document.querySelectorAll('.announcement-card');
-    
-    cards.forEach(card => {
-        const cardKategori = card.querySelector('.announcement-kategori').textContent;
-        
-        if (kategori === 'Semua' || cardKategori === kategori) {
-            card.closest('.col').style.display = 'block';
-        } else {
-            card.closest('.col').style.display = 'none';
-        }
-    });
-}
 </script>
 </body>
 </html>

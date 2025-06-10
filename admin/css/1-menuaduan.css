@@ -4,11 +4,13 @@
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* Menambahkan overflow-x auto untuk tampilan responsif */
 }
 
 /* Gaya untuk tabel */
 table {
   width: 100%;
+  min-width: 600px; /* Menambahkan lebar minimum untuk tabel */
   border-collapse: collapse;
   background-color: #ffffff;
   border-radius: 8px;
@@ -21,6 +23,7 @@ table td {
   border: 1px solid #dee2e6;
   padding: 12px 15px;
   text-align: left;
+  white-space: nowrap; /* Mencegah teks membungkus di dalam sel tabel */
 }
 
 table th {
@@ -101,4 +104,30 @@ table tr:hover {
 
 #pieChart:hover {
   filter: brightness(1.1);
+}
+
+/* agar table tidak keluar dari parent di layar kecil */
+@media (max-width: 768px) {
+  .tampilan-aduan table {
+    min-width: 500px;
+    font-size: 0.95rem;
+  }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-responsive table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+}
+
+@media (max-width: 768px) {
+  .table-responsive table {
+    min-width: 600px;
+    font-size: 0.95rem;
+  }
 }
